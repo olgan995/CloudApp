@@ -1,0 +1,17 @@
+stages:
+  - build-and-test
+
+build-and-test:
+  stage: build-and-test
+  image: openjdk:17-oracle
+  script:
+    - cd backend/
+    - chmod +x ./gradlew
+    - ./gradlew build jacocoTestReport
+  artifacts:
+    when: always
+    paths:
+      - build/reports/
+  only:
+    - main
+    - dev

@@ -1,0 +1,63 @@
+logging:
+  level:
+    org.springframework: WARN
+---
+spring:
+  profiles:
+    active: dev
+---
+spring:
+  jpa:
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: false
+        use_sql_comments: true
+  datasource:
+    url: jdbc:postgresql://dpg-cl0obt8p2gis738jvck0-a.frankfurt-postgres.render.com/seinclouddb
+    username: seinclouddb_user
+    password: 2vgyqkCZG5jdaBeJfsXvHfaY1Layy8lL
+
+  config:
+    activate:
+      on-profile: prod
+---
+spring:
+  jpa:
+    database: H2
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: false
+        use_sql_comments: true
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE;
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      settings:
+        webAllowOthers: true
+  config:
+    activate:
+      on-profile: dev
+---
+spring:
+  mail:
+    host: fakehost
+    port: 587
+    username: fake
+    password: fake
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
