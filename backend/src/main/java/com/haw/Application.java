@@ -6,6 +6,8 @@ import com.haw.appuser.dataaccess.api.entity.AppUser;
 import com.haw.appuser.dataaccess.api.entity.Role;
 import com.haw.appuser.dataaccess.api.repo.UserRepository;
 
+import com.haw.task.dataaccess.api.entity.Task;
+import com.haw.task.dataaccess.api.repo.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -19,6 +21,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 
 
@@ -49,15 +52,17 @@ public class Application {
 class PopulateTestDataRunner implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
 
 
     private final PasswordEncoder passwordEncoder;
 
 
     @Autowired
-    public PopulateTestDataRunner(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public PopulateTestDataRunner(UserRepository userRepository, PasswordEncoder passwordEncoder, TaskRepository taskRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.taskRepository = taskRepository;
     }
 
     @Transactional
@@ -72,6 +77,22 @@ class PopulateTestDataRunner implements CommandLineRunner {
 
         userRepository.save(appUser1);
         userRepository.save(appUser2);
+
+
+        // Create dummy tasks
+        Task task1 = new Task("Task 1", "Description 1, Task for DummyUser6",
+                new Date(), false, appUser1.getId(), appUser1);
+        Task task2 = new Task("Task 2", "Description 2, Task for AdminUser7",
+                new Date(), false, appUser2.getId(), appUser2);
+
+
+        taskRepository.save(task1);
+        taskRepository.save(task2);
+        appUser1.addNewTaskToListOfTasks(task1);
+        appUser2.addNewTaskToListOfTasks(task2);
+        userRepository.save(appUser1);
+        userRepository.save(appUser2);
+
 
     }
 }
