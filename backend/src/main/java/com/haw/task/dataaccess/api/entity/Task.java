@@ -1,11 +1,10 @@
 package com.haw.task.dataaccess.api.entity;
 
+import com.haw.appuser.dataaccess.api.entity.AppUser;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Date;
 
 @Data // generates constructors, getters and more
 @NoArgsConstructor(force = true) // generates a default constructor (required by Hibernate)
@@ -20,4 +19,26 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Setter(AccessLevel.NONE) // prevents generation of a public setter for this field by Lombok
     private Long id;
+
+
+    private String taskName;
+    private String description;
+    private Date dueDate;
+    private boolean completed;
+    private Long ownerId;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private AppUser user; // Beziehung zur Benutzerentität
+
+    public Task(String taskName, String description, Date dueDate, boolean completed, Long ownerId, AppUser user) {
+        this.taskName = taskName;
+        this.description = description;
+        this.dueDate = dueDate;
+        this.completed = completed;
+        this.ownerId = ownerId;
+        this.user = user;
+    }
+
+    // Konstruktor, Getter und Setter
 }
