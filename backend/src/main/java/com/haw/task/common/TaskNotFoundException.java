@@ -12,7 +12,7 @@ public class TaskNotFoundException extends Exception{
 
     Long id;
     public TaskNotFoundException(Long id) {
-        super(String.format("Could not find category: %d.",id ));
+        super(String.format("Could not task with ID: %d.",id ));
         this.id = id;
     }
 
