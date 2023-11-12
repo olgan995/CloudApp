@@ -1,3 +1,39 @@
 body, html {
     overflow-x: hidden;
+    font-family: Arial, sans-serif;
+}
+
+.custom-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.custom-box {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 400px;
+}
+
+.custom-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.custom-form .form-group {
+    margin-bottom: 20px;
+}
+
+.custom-form .btn-primary {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
