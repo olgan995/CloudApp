@@ -34,6 +34,7 @@ public class AppUser implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Setter(AccessLevel.NONE) // prevents generation of a public setter for this field by Lombok
+    @Column(name = "user_id")
     private Long id;
 
     @NotNull // adds a constraint for this field (checked by Hibernate during saving)
@@ -52,7 +53,7 @@ public class AppUser implements UserDetails {
     @NotNull
     private Password password;
 
-/*    @ToString.Exclude
+    @ToString.Exclude
     @JsonManagedReference
     @OneToMany( // this entity can have multiple children, and every child can have multiple parents
             //cascade = CascadeType.ALL, // also removes children when this entity is removed
@@ -67,9 +68,10 @@ public class AppUser implements UserDetails {
             fetch = FetchType.LAZY // loads all children when this entity is loaded (not only when accessing them)
     )
     @Setter(AccessLevel.NONE) // prevents generation of a public setter for this field by Lombok
-    private List<Task> listOfTasks = new ArrayList<>();*/
+    private List<Task> listOfTasks = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
+
     private Role role;
 
 
