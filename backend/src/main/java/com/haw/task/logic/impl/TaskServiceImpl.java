@@ -5,6 +5,7 @@ import com.haw.appuser.dataaccess.api.entity.AppUser;
 import com.haw.appuser.dataaccess.api.repo.UserRepository;
 import com.haw.task.common.TaskDto;
 import com.haw.task.common.TaskNotFoundException;
+import com.haw.task.common.ForbiddenOperationException;
 import com.haw.task.dataaccess.api.entity.Task;
 import com.haw.task.dataaccess.api.repo.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,19 +13,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class TaskServiceImpl  {
+public class TaskServiceImpl {
 
     @Autowired
     TaskRepository taskRepository;
 
     @Autowired
     UserRepository userRepository;
-
 
 
     public List<Task> getAllTasks() throws UserNotFoundByUsernameException {
@@ -64,20 +63,54 @@ public class TaskServiceImpl  {
     }
 
 
-    public Task updateTask(Long taskId, TaskDto updatedTask) throws TaskNotFoundException {
+    public Task updateTask(Long taskId, TaskDto updatedTask) throws TaskNotFoundException,
+            UserNotFoundByUsernameException,
+            ForbiddenOperationException {
+        Long currentUserID = findUser().getId();
+
+
+        //AppUser currentUser = findUser();
         Task taskToEdit = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException(taskId));
-        return null;
+
+        if (!taskToEdit.getOwnerId().equals(currentUserID)) {
+            throw new ForbiddenOperationException("You are not allowed to update this task");
+        }
+
+
+        // Update the fields you want to allow modification
+        if (updatedTask.getTaskName() != null) {
+            taskToEdit.setTaskName(updatedTask.getTaskName());
+        }
+        if (updatedTask.getDescription() != null) {
+            taskToEdit.setDescription(updatedTask.getDescription());
+        }
+        if (updatedTask.getDueDate() != null) {
+            taskToEdit.setDueDate(updatedTask.getDueDate());
+        }
+        if (updatedTask.isCompleted() != taskToEdit.isCompleted()) {
+            taskToEdit.setCompleted(updatedTask.isCompleted());
+        }
+        // Save the updated task
+        return taskRepository.save(taskToEdit);
     }
 
-    public void deleteTask(Long taskId) {
-        taskRepository.deleteById(taskId);
-    }
+    public void deleteTask(Long taskId) throws TaskNotFoundException, UserNotFoundByUsernameException, ForbiddenOperationException {
 
+        Long currentUserID = findUser().getId();
+        Task existingTask = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException(taskId));
+
+        if (!existingTask.getOwnerId().equals(currentUserID)) {
+            throw new ForbiddenOperationException("You are not allowed to delete this task");
+        }
+
+        taskRepository.delete(existingTask);
+    }
 
 
     private AppUser findUser() throws UserNotFoundByUsernameException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = userDetails.getUsername();
-        return userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundByUsernameException(username));
+        return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundByUsernameException(username));
     }
 }
