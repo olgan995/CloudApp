@@ -1,0 +1,29 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - dev-tasks  # Adding dev-tasks branch
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: Build and Test Backend
+        run: |
+          cd backend/
+          chmod +x ./gradlew
+          ./gradlew build
+        working-directory: ${{ github.workspace }}
