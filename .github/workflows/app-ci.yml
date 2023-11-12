@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - dev-tasks  # Adding dev-tasks branch
 
 jobs:
   backend:
@@ -17,8 +18,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 17
-          distribution: 'adopt'  # Specify the distribution you want, e.g., 'adopt', 'adopt@1', 'zulu', etc.
+          java-version: '17'
+          distribution: 'adopt'
 
       - name: Build and Test Backend
         run: |
