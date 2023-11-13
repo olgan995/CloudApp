@@ -61,7 +61,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
         return ResponseEntity.ok("Logged out successfully");    }
 
     private String extractTokenFromRequest(HttpServletRequest request) {
-        return request.getHeader("Authorization").replace("Bearer ", "");
+
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.replace("Bearer ", "");
+        }
+        return null;
     }
 
 
