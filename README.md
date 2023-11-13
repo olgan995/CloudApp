@@ -1,6 +1,6 @@
 # Simple ToDo Tasks App
 
-Dies ist eine einfache Anwendung für die Verwaltung von Aufgaben, entwickelt im Rahmen des Praktikums für Veranstaltungssoftware Engineering in der Cloud.
+Dies ist eine einfache Anwendung für die Verwaltung von Aufgaben, entwickelt im Rahmen des Praktikums für Veranstaltung Software Engineering in der Cloud.
 
 ## Funktionen
 
