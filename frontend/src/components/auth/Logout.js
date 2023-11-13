@@ -1,27 +1,34 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import { Button, Container, Row } from 'react-bootstrap';
 import api from '../../services/api';
-
 const Logout = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [success, setSuccess] = useState(null);
+
+    useEffect(() => {
+        if (location.state && location.state.successMessage) {
+            setSuccess(location.state.successMessage);
+            localStorage.setItem('logoutSuccessMessage', location.state.successMessage);
+        }
+    }, [location.state]);
+
+    const clearAuthentication = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('logoutSuccessMessage');
+    };
 
     const handleLogout = () => {
         api.logoutUser()
             .then(response => {
                 console.log('Logout Response:', response);
-                clearAuthentication();
-                navigate('/login');
+                navigate('/login', { state: { successMessage: 'Logout successful. Please login again!' } });
             })
             .catch(error => {
                 console.error('Logout error:', error);
-                clearAuthentication();
-                navigate('/login');
+                navigate('/login', { state: { successMessage: 'Logout successful. Please login again!' } });
             });
-    };
-
-    const clearAuthentication = () => {
-        localStorage.removeItem('token');
     };
 
     return (
@@ -29,7 +36,8 @@ const Logout = () => {
             <Row className="justify-content-center mt-5">
                 <div className="text-center">
                     <h2>Are you sure you want to log out?</h2>
-                    <Button variant="primary" onClick={handleLogout}>
+                    {success && <p style={{ color: 'green' }}>{success}</p>}
+                    <Button variant="primary" onClick={() => { handleLogout(); clearAuthentication(); }}>
                         Logout
                     </Button>
                 </div>
