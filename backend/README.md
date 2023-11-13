@@ -1,9 +1,3 @@
-# Beispielprojekt mit Java, SpringBoot und Gradle (advanced)
-
-Software-Engineering 1, Bachelor Angewandte Informatik
-
-Stefan Sarstedt, stefan.sarstedt(at)haw-hamburg.de  
-Sven Berding, sven.berding(at)haw-hamburg.de
 
 ## A. Einrichtung des JDK und Ausführen der Tests
 
