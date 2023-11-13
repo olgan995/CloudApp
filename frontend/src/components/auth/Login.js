@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button, Container } from 'react-bootstrap';
-import '../styles/global.css';
 import { Link, useNavigate } from 'react-router-dom';
+import '../styles/global.css';
 import api from '../../services/api';
 
 const Login = () => {
@@ -17,18 +17,29 @@ const Login = () => {
         setUserData({ ...userData, [name]: value });
     };
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
+        try {
+            const response = await api.loginUser(userData);
+            const { token } = response.data;
+            localStorage.setItem('token', token);
 
-        api.loginUser(userData)
-            .then((response) => {
-                console.log('User logged in successfully:', response.data);
-                navigate('/tasks');
-            })
-            .catch((error) => {
+            // Logging success message
+            console.log('Token set in localStorage:', localStorage.getItem('token'));
+            console.log('User logged in successfully:', response.data);
+
+            // Navigating to /tasks after the state is updated
+            navigate('/tasks', { replace: true });
+            console.log('User navigated to /tasks');
+        } catch (error) {
+            // Handling errors, checking for 401 (Unauthorized) status
+            if (error.response && error.response.status === 401) {
                 setError('Invalid credentials. Please try again.');
+            } else {
+                setError('An error occurred. Please try again.');
                 console.error('Login error:', error);
-            });
+            }
+        }
     };
 
     return (
@@ -70,6 +81,7 @@ const Login = () => {
             </div>
         </Container>
     );
+
 };
 
 export default Login;

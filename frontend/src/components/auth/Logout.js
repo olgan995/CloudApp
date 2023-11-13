@@ -6,13 +6,10 @@ import api from '../../services/api';
 const Logout = () => {
     const navigate = useNavigate();
 
-    const clearAuthentication = () => {
-        localStorage.removeItem('authToken');
-    };
-
     const handleLogout = () => {
         api.logoutUser()
-            .then(() => {
+            .then(response => {
+                console.log('Logout Response:', response);
                 clearAuthentication();
                 navigate('/login');
             })
@@ -21,6 +18,10 @@ const Logout = () => {
                 clearAuthentication();
                 navigate('/login');
             });
+    };
+
+    const clearAuthentication = () => {
+        localStorage.removeItem('token');
     };
 
     return (
