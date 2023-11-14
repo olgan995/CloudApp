@@ -1,0 +1,342 @@
+openapi: 3.0.3
+info:
+  title: ToDoTasks API 2023
+  description: The ToDoTasks API provides endpoints for user authentication and managing to-do tasks.
+  termsOfService: TODO
+  contact:
+    url: TODO
+    email: testemail@gmail.com
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: https://swagger.io
+servers:
+  - url: TODO
+tags:
+  - name: auth
+    description:  Operations about authentication
+  - name: tasks
+    description: Operations related to to-do tasks
+paths:
+  ################
+  # Auth section #
+  ################
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary:  Register a new user.
+      description: Creates a new user with the given name, email and password.
+      operationId: registerUser
+      requestBody:
+        description: User registration data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRegister'
+        required: true
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationResponse'
+        '400':
+          description: Invalid registration request
+        '401':
+          description: Invalid Credentials
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Authenticate a user
+      description: Authenticate the user with username and password.
+      operationId: authenticateUser
+      requestBody:
+        description: Data of new user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthLogin'
+        required: true
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationResponse'
+        '400':
+          description: Bad Request
+        '404':
+          description: User not found
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: Log out a user
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            description: Bearer token
+      description: Log out a user by invalidating their token.
+      operationId: logoutUser
+      requestBody:
+        description: Data of new user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthLogin'
+        required: true
+      responses:
+        '200':
+          description: User logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Logged out successfully
+                required:
+                  - message
+
+  ################
+  # Task section #
+  ################
+  /tasks:
+    get:
+      tags:
+        - tasks
+      summary: Get all tasks
+      description: Get a list of all to-do tasks
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllTasksResponse'
+        "400":
+          description: Bad Request
+        "401":
+          description: Invalid Credentials
+    post:
+      tags:
+        - tasks
+      summary: Create a task
+      description: Create a new to-do task
+      requestBody:
+        description: Task to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostTaskRequest'
+        required: true
+      responses:
+        "201":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        "400":
+          description: Invalid input
+        "401":
+          description: Invalid Credentials
+
+  /tasks/{taskId}:
+    parameters:
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+        description: Task-Id of the ToDO-List
+    get:
+      tags:
+        - tasks
+      summary: Get a task by ID
+      description: Get a specific to-do task by its ID
+      parameters:
+        - name: taskId
+          in: header
+          schema:
+            type: string
+            format: string18
+          required: true
+          description: ID of the task to retrieve
+      responses:
+        200:
+          description: Task details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        404:
+          description: Task not found
+    put:
+      tags:
+        - tasks
+      summary: Update a task
+      description: Update an existing to-do task
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        "400":
+          description: Invalid input
+        "401":
+          description: Invalid Credentials
+        404:
+          description: Task not found
+    delete:
+      tags:
+        - tasks
+      summary: Delete a task
+      description: Delete a to-do task by its ID
+      parameters:
+        - name: taskId
+          in: path
+          schema:
+            type: string
+            format: string18
+          required: true
+          description: ID of the task to delete
+      responses:
+        '204':
+          description: Task deleted
+        '400':
+          description: Bad Request
+        '404':
+          description: Task not found
+
+components:
+  schemas:
+    ################
+    # Auth Section #
+    ################
+    AuthRegister:
+      type: object
+      properties:
+        username:
+          type: string
+          format: string18
+          example: 'Max Mustermann'
+        email:
+          type: string
+          format: string18
+          example: 'max.mustermann@gmail.com'
+        password:
+          type: string
+          format: string18
+          example: '****'
+
+    AuthenticationResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          format: string18
+          example: 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjc3MjMxMTE4LCJleHAiOjE2Nzc4MzU5MTh9.LlZcGCpy9SwHPP49mNOQGNaoJVPSCRaoALXdX3HaYT285R0aPXmjaVSENY8Vnp-FSUp2bGisCnx15QY4S61sDU8JH2pMdqFllfJVtpt6_3WcWg_BqNObKDdc4hE3ZtHcKJVcGOpEJhcjvac-W7pUTQHMif1iW-VLrBJM5oJw504AvR2BiR6wuTrP9IHo6WDQ1xufcFA6x7YFnoMw-YWdJV7cPqadouFMoc_QV7fgsWoKj9gq4s4qCxSn9t3-Kf4ZH3KKymUOeXN9HBlu_0JFXb3Q-jhKxfh9gZQIN03ldXMLUqoIGJLsxZpYEFATbHSMGwomce6SB9LNJ7mXQGLg0Q'
+        userId:
+          type: number
+          format: int64
+          example: 5
+        name:
+          type: string
+          format: string18
+          example: 'MaxMustermann'
+
+    AuthLogin:
+      type: object
+      properties:
+        username:
+          type: string
+          format: string18
+          example: 'MaxMustermann'
+        password:
+          type: string
+          format: string18
+          example: '****'
+      required:
+        - username
+        - password
+
+    ################
+    # Task Section #
+    ################
+    Task:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - dueDate
+        - completed
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        name:
+          type: string
+          format: string18
+          example: Finish project
+        description:
+          type: string
+          format: string18
+          example: Complete the API and front-end integration.
+        dueDate:
+          type: string
+          format: date-time
+          example: '2023-12-31T23:59:59.999Z'
+        completed:
+          type: boolean
+          example: false
+
+    GetAllTasksResponse:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+
+    PostTaskRequest:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - dueDate
+        - completed
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        name:
+          type: string
+          format: string18
+          example: Finish project
+        description:
+          type: string
+          format: string18
+          example: Complete the API and front-end integration.
+        dueDate:
+          type: string
+          format: date-time
+          example: '2023-12-31T23:59:59.999Z'
+        completed:
+          type: boolean
+          example: false
