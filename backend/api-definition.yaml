@@ -14,7 +14,7 @@ servers:
   - url: TODO
 tags:
   - name: auth
-    description:  Operations about authentication
+    description: Operations about authentication
   - name: tasks
     description: Operations related to to-do tasks
 paths:
@@ -25,7 +25,7 @@ paths:
     post:
       tags:
         - auth
-      summary:  Register a new user.
+      summary: Register a new user.
       description: Creates a new user with the given name, email and password.
       operationId: registerUser
       requestBody:
@@ -43,9 +43,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/AuthenticationResponse'
         '400':
-          description: Invalid registration request
-        '401':
-          description: Invalid Credentials
+          description: Invalid registration request. Registration data is incomplete
+        '409':
+          description: Conflict. User already exists
   /auth/login:
     post:
       tags:
@@ -69,8 +69,8 @@ paths:
                 $ref: '#/components/schemas/AuthenticationResponse'
         '400':
           description: Bad Request
-        '404':
-          description: User not found
+        '401':
+          description: User not found -> Unauthorized
   /auth/logout:
     post:
       tags:
@@ -125,7 +125,7 @@ paths:
         "400":
           description: Bad Request
         "401":
-          description: Invalid Credentials
+          description: Unauthorized
     post:
       tags:
         - tasks
@@ -146,9 +146,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Task'
         "400":
-          description: Invalid input
+          description: Bad Request
         "401":
-          description: Invalid Credentials
+          description: Unauthorized
 
   /tasks/{taskId}:
     parameters:
@@ -181,7 +181,9 @@ paths:
                 $ref: '#/components/schemas/Task'
         404:
           description: Task not found
-    put:
+        401:
+          description: Unauthorized
+    patch:
       tags:
         - tasks
       summary: Update a task
@@ -194,9 +196,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Task'
         "400":
-          description: Invalid input
+          description: Bad request
         "401":
-          description: Invalid Credentials
+          description: Unauthorized
         404:
           description: Task not found
     delete:
@@ -213,7 +215,7 @@ paths:
           required: true
           description: ID of the task to delete
       responses:
-        '204':
+        '200':
           description: Task deleted
         '400':
           description: Bad Request
