@@ -58,6 +58,10 @@ dependencies {
     testImplementation 'org.hamcrest:java-hamcrest:2.0.0.0'
 }
 
+jar {
+    enabled = true
+}
+
 test {
     useJUnitPlatform {
         includeEngines 'junit-jupiter'
