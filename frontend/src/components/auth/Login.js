@@ -24,6 +24,8 @@ const Login = () => {
         try {
             const response = await api.loginUser(userData);
             const { token } = response.data;
+
+            // Store the token in local storage
             localStorage.setItem('token', token);
 
             // Logging success message
@@ -31,7 +33,7 @@ const Login = () => {
             console.log('User logged in successfully:', response.data);
 
             // Navigating to /tasks after the state is updated
-            navigate('/tasks', { replace: true });
+            navigate('/tasks');
             console.log('User navigated to /tasks');
         } catch (error) {
             // Handling errors
