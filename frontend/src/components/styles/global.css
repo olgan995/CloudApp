@@ -37,3 +37,18 @@ body, html {
     margin: 0 auto;
     padding: 0 20px;
 }
+
+/* AllTasks.css */
+
+.all-tasks-title {
+    font-size: 28px; /* Adjust the font size of the title */
+}
+
+.task-item {
+    margin-bottom: 20px; /* Add space between each task item */
+}
+
+.task-title {
+    font-size: 20px; /* Adjust the font size of the task title */
+    font-weight: bold; /* Add bold styling to the task title */
+}

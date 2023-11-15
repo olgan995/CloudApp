@@ -1,26 +1,40 @@
 import React from 'react';
-import { Container, ListGroup } from 'react-bootstrap';
+import { Container, Card } from 'react-bootstrap';
+
+const Task = ({ title, description, dueDate, completed }) => {
+    return (
+        <Card className="mb-3">
+            <Card.Body>
+                <Card.Title>{title}</Card.Title>
+                <Card.Text>Description: {description}</Card.Text>
+                <Card.Text>Due Date: {dueDate}</Card.Text>
+                <Card.Text>Status: {completed ? 'Completed' : 'Incomplete'}</Card.Text>
+            </Card.Body>
+        </Card>
+    );
+};
 
 const Test = () => {
     const tasks = [
-        { id: 1, title: 'Task 1', completed: false },
-        { id: 2, title: 'Task 2', completed: true },
-        { id: 3, title: 'Task 3', completed: false },
-        { id: 4, title: 'Task 4', completed: true },
-        { id: 5, title: 'Task 5', completed: false },
+        { title: 'Task 1', description: 'Description for Task 1', dueDate: '2023-11-30', completed: false },
+        { title: 'Task 2', description: 'Description for Task 2', dueDate: '2023-12-15', completed: true },
+        { title: 'Task 3', description: 'Description for Task 3', dueDate: '2023-12-31', completed: false },
+        { title: 'Task 4', description: 'Description for Task 4', dueDate: '2023-11-20', completed: true },
+        { title: 'Task 5', description: 'Description for Task 5', dueDate: '2023-12-05', completed: false },
     ];
 
     return (
         <Container className="mt-4">
-            <h2 className="text-center">Todo Tasks</h2>
-            <ListGroup>
-                {tasks.map((task) => (
-                    <ListGroup.Item key={task.id} className="d-flex justify-content-between">
-                        <span>{task.title}</span>
-                        <span>{task.completed ? 'Completed' : 'Incomplete'}</span>
-                    </ListGroup.Item>
-                ))}
-            </ListGroup>
+            <h2 className="text-center">Todo Lists</h2>
+            {tasks.map((task, index) => (
+                <Task
+                    key={index}
+                    title={task.title}
+                    description={task.description}
+                    dueDate={task.dueDate}
+                    completed={task.completed}
+                />
+            ))}
         </Container>
     );
 };

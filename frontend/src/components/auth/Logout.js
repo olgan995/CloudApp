@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import { Button, Container, Row } from 'react-bootstrap';
 import api from '../../services/api';
+
 const Logout = () => {
     const navigate = useNavigate();
     const location = useLocation();
