@@ -17,6 +17,10 @@ COPY src ./src
 # Add execution permission for gradlew script
 RUN chmod +x gradlew
 
+# Convert line endings to LF
+RUN apt-get update && apt-get install -y dos2unix
+RUN dos2unix gradlew
+
 RUN ./gradlew --no-daemon wrapper
 RUN ./gradlew --no-daemon build
 

@@ -40,6 +40,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
     testImplementation 'org.projectlombok:lombok:1.18.26'
 
+    //GCP
+    implementation group: 'com.google.cloud', name: 'spring-cloud-gcp-starter-sql-postgresql', version: '2.0.4'
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'

@@ -57,6 +57,8 @@ public class SecurityConfig {
                 .addFilterBefore(jwdAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler);
 
+        http.formLogin().disable();
+
         return http.build();
     }
 

@@ -53,8 +53,6 @@ class PopulateTestDataRunner implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
-
-
     private final PasswordEncoder passwordEncoder;
 
 
@@ -70,7 +68,7 @@ class PopulateTestDataRunner implements CommandLineRunner {
     public void run(String... args) {
 
 
-        AppUser appUser1 = new AppUser("DummyUser6", "test6@dummy.org",
+/*        AppUser appUser1 = new AppUser("DummyUser6", "test6@dummy.org",
                 (new Password(passwordEncoder.encode("qwerty1234!"))), Role.USER);
         AppUser appUser2 = new AppUser("AdminUser7", "test7@dummy.org",
                 (new Password(passwordEncoder.encode("qwerty1234!"))), Role.ADMIN);
@@ -91,8 +89,6 @@ class PopulateTestDataRunner implements CommandLineRunner {
         appUser1.addNewTaskToListOfTasks(task1);
         appUser2.addNewTaskToListOfTasks(task2);
         userRepository.save(appUser1);
-        userRepository.save(appUser2);
-
-
+        userRepository.save(appUser2);*/
     }
 }

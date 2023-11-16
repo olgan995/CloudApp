@@ -13,18 +13,23 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: update
+    #ddl-auto: none
     properties:
       hibernate:
         show_sql: false
         use_sql_comments: true
   datasource:
-    url: jdbc:postgresql://dpg-cl0obt8p2gis738jvck0-a.frankfurt-postgres.render.com/seinclouddb
-    username: seinclouddb_user
-    password: 2vgyqkCZG5jdaBeJfsXvHfaY1Layy8lL
+    username: postgres
+    password: 2767981
+  cloud:
+    gcp:
+      sql:
+        database-name: postgres
+        instance-connection-name: gruppe1cc:europe-west10:cloudappdb
 
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
 ---
 spring:
   jpa:
@@ -47,7 +52,7 @@ spring:
         webAllowOthers: true
   config:
     activate:
-      on-profile: dev
+      on-profile: test
 ---
 spring:
   mail:
