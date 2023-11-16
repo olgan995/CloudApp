@@ -8,11 +8,22 @@ const PrivateRoute = ({ element }) => {
     // If user is not authenticated, display an unauthorized message
     if (!isAuthenticated) {
         return (
-            <div>
-                <h1>Unauthorized Access</h1>
-                <p>You are not authorized to access this page.</p>
-                <p>Please log in to access this content.</p>
-                <Link to="/login">Log in</Link>
+            <div className="container mt-5">
+                <div className="row justify-content-center">
+                    <div className="col-md-6">
+                        <div className="card">
+                            <div className="card-body">
+                                <h1 className="card-title text-center">Unauthorized Access</h1>
+                                <p className="card-text text-center">
+                                    You are not authorized to access this page.
+                                </p>
+                                <p className="card-text text-center">
+                                    Please <Link to="/login">Log in</Link> to access this content.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
