@@ -15,6 +15,7 @@ const AllTasks = () => {
                 const token = localStorage.getItem('token');
                 if (token) {
                     setAuthToken(token);
+                    console.log("token: ", token)
                     const response = await api.getAllTasks();
                     setTasks(response.data);
                 }
