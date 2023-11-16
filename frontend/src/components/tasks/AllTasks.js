@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, ListGroup } from 'react-bootstrap';
 import api from "../../services/api";
+import { setAuthToken } from "../../services/api";
 import '../styles/global.css';
 
 const AllTasks = () => {
@@ -11,8 +12,13 @@ const AllTasks = () => {
         // Function to fetch tasks from the backend
         const fetchTasks = async () => {
             try {
-                const response = await api.getAllTasks();
-                setTasks(response.data);
+                const token = localStorage.getItem('token');
+                if (token) {
+                    setAuthToken(token);
+                    console.log("token: ", token)
+                    const response = await api.getAllTasks();
+                    setTasks(response.data);
+                }
             } catch (error) {
                 setError('Error fetching tasks. Please try again.');
                 console.error('Tasks fetch error:', error);
