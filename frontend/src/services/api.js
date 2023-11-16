@@ -25,6 +25,7 @@ export const loginUser = (userData) => api.post('/auth/login', userData)
         setAuthToken(token);
         return response;
     });
+
 export const logoutUser = (userData) => {
     // Clear the token in local storage and headers on logout
     localStorage.removeItem('token');
