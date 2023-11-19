@@ -1,10 +1,13 @@
 package com.haw.config;
 
+import com.haw.appuser.dataaccess.api.entity.InvalidToken;
+import com.haw.appuser.dataaccess.api.repo.InvalidTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,48 +19,49 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    @Autowired
+    private InvalidTokenRepository invalidTokenRepository;
+
     private static final String SECRET_KEY = "59703273357638792F423F4528482B4D6251655468576D5A7134743777397A24";
-    private Set<String> invalidTokens = new HashSet<>();
+
     public String extractUsername(String token) {
-        return extractClaim(token,Claims::getSubject);
+        return extractClaim(token, Claims::getSubject);
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails){
+    public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails){
-
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                //24 hours valid
+                // 24 hours valid
                 .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1)))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails){
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token) && !invalidTokens.contains(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token) && !isTokenInvalid(token);
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before (new Date());
+        return extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String token){
+    private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
@@ -66,12 +70,18 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte [] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
-
     }
 
     public void invalidateToken(String token) {
-        invalidTokens.add(token);
+        InvalidToken invalidToken = new InvalidToken();
+        invalidToken.setTokenValue(token);
+        invalidToken.setInvalidationTime(new Date());
+        invalidTokenRepository.save(invalidToken);
+    }
+
+    private boolean isTokenInvalid(String token) {
+        return invalidTokenRepository.existsByTokenValue(token);
     }
 }
