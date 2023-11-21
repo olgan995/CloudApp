@@ -8,7 +8,6 @@ import Register from "./components/auth/Register";
 import Logout from "./components/auth/Logout";
 import AllTasks from "./components/tasks/AllTasks";
 import { setAuthToken } from './services/api';
-import Test from "./components/tasks/Test";
 import PrivateRoute from "./components/auth/PrivateRoute";
 
 const App = () => {
@@ -36,7 +35,6 @@ const App = () => {
                         )} />
                     )}
                 />
-                <Route path="/test" element={<Layout> <Test /> </Layout>} />
             </Routes>
         </Router>
     );
