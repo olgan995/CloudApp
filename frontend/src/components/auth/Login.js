@@ -86,7 +86,7 @@ const Login = () => {
                         />
                     </Form.Group>
 
-                    <Button variant="primary" type="submit" onClick={handleLogin}>
+                    <Button variant="primary" type="submit" onClick={handleLogin} className="rounded-pill">
                         Login
                     </Button>
 

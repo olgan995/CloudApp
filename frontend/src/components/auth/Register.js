@@ -74,7 +74,7 @@ const Register = () => {
                         />
                     </Form.Group>
 
-                    <Button variant="primary" type="button" onClick={handleRegister}>
+                    <Button variant="primary" type="button" onClick={handleRegister} className="rounded-pill">
                         Register
                     </Button>
 
