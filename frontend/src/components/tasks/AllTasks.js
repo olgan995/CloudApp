@@ -4,6 +4,7 @@ import api from "../../services/api";
 import { setAuthToken } from "../../services/api";
 import Task from './Task';
 import AddTask from "./AddTask";
+import DeleteTask from "./DeleteTask";
 
 const AllTasks = () => {
     const [tasks, setTasks] = useState([]);
@@ -51,6 +52,37 @@ const AllTasks = () => {
             console.error('Task add error:', error);
         }
     };
+    const [taskToDelete, setTaskToDelete] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const handleShowDeleteModal = () => setShowDeleteModal(true);
+    const handleCloseDeleteModal = () => {
+        setShowDeleteModal(false);
+        setTaskToDelete(null);
+    };
+    const handleDelete = (taskId) => {
+        setTaskToDelete(taskId);
+        handleShowDeleteModal();
+    };
+
+    const handleDeleteConfirm = async () => {
+        try {
+            const response = await api.deleteTask(taskToDelete);
+            console.log('Deleted Task Response:', response.data);
+
+            // Filter out the deleted task from the current state
+            const updatedTasks = tasks.filter(task => task.id !== taskToDelete);
+            setTasks(updatedTasks);
+
+            // Fetch tasks again after deleting a task
+            const refreshedTasks = await api.getAllTasks();
+            setTasks(refreshedTasks.data);
+
+            handleCloseDeleteModal();
+        } catch (error) {
+            setError('Error deleting task. Please try again.');
+            console.error('Task delete error:', error);
+        }
+    };
 
 
     return (
@@ -72,9 +104,16 @@ const AllTasks = () => {
                 />
             </div>
 
+            {/* Render the DeleteTask component */}
+            <DeleteTask
+                showModal={showDeleteModal}
+                handleClose={handleCloseDeleteModal}
+                handleDeleteTask={handleDeleteConfirm}
+            />
+
             <div className="d-flex m-3">
                 {tasks.map((task) => (
-                    <Task key={task.id} task={task} />
+                    <Task key={task.id} task={task} handleDelete={handleDelete} />
                 ))}
             </div>
 
