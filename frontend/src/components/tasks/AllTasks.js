@@ -92,7 +92,7 @@ const AllTasks = () => {
             {error && <p style={{ color: 'red' }}>{error}</p>}
 
             <div className="d-flex justify-content-center m-3">
-                <Button variant="primary" className="rounded-pill" onClick={handleShow}>
+                <Button variant="primary" className="rounded-pill btn-lg" onClick={handleShow}>
                     Add Task
                 </Button>
 
