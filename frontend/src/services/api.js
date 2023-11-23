@@ -24,13 +24,34 @@ export const loginUser = (userData) => api.post('/auth/login', userData)
         localStorage.setItem('token', token);
         setAuthToken(token);
         return response;
-    });
+});
 
-export const logoutUser = (userData) => {
-    // Clear the token in local storage and headers on logout
+export const logoutUser = (setAuthToken) => {
+    // Get the token from local storage
+    const token = localStorage.getItem('token');
+
+    // Clear the token in local storage
     localStorage.removeItem('token');
-    setAuthToken(null);
-    return api.post('/auth/logout', userData);
+
+    // If setAuthToken is available, clear the authentication token
+    if (setAuthToken) {
+        setAuthToken(null);
+    }
+
+    // Send the token to the backend for invalidation using headers
+    return api.post('/auth/logout', null, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        console.log('Logout successful:', response.data); // Log success message
+        return response;
+    })
+    .catch(error => {
+        console.error('Logout error:', error);
+        throw error;
+    });
 };
 export const getAllTasks = () => api.get('/tasks');
 export const createTask = (taskData) => api.post('/tasks', taskData);

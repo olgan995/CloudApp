@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import { Button, Container, Row } from 'react-bootstrap';
-import api from '../../services/api';
+import {logoutUser} from '../../services/api';
 
 const Logout = () => {
     const navigate = useNavigate();
@@ -21,16 +21,10 @@ const Logout = () => {
     };
 
     const handleLogout = () => {
-        api.logoutUser()
-            .then(response => {
-                console.log('Logout Response:', response);
-                navigate('/login', { state: { successMessage: 'Logout successful. Please login again!' } });
-            })
-            .catch(error => {
-                console.error('Logout error:', error);
-                navigate('/login', { state: { successMessage: 'Logout successful. Please login again!' } });
-            });
+        logoutUser();
+        navigate('/login', { state: { successMessage: 'Logout successful. Please login again!' } });
     };
+
 
     return (
         <Container>
@@ -38,7 +32,7 @@ const Logout = () => {
                 <div className="text-center">
                     <h2>Are you sure you want to log out?</h2>
                     {success && <p style={{ color: 'green' }}>{success}</p>}
-                    <Button variant="primary" onClick={() => { handleLogout(); clearAuthentication(); }}>
+                    <Button variant="primary" onClick= {handleLogout}>
                         Logout
                     </Button>
                 </div>

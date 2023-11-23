@@ -1,4 +1,3 @@
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import React, { useEffect } from 'react';
@@ -10,7 +9,6 @@ import Logout from "./components/auth/Logout";
 import AllTasks from "./components/tasks/AllTasks";
 import { setAuthToken } from './services/api';
 import PrivateRoute from "./components/auth/PrivateRoute";
-import Test from "./components/tasks/Test";
 import UpdateTask from "./components/tasks/UpdateTask";
 
 const App = () => {
@@ -37,7 +35,6 @@ const App = () => {
                     )}
                 />
                 <Route path="/update-task/:taskId" element={<PrivateRoute element={<UpdateTask />} />} />
-                <Route path="/test" element={<Layout> <Test /> </Layout>} />
             </Routes>
         </Router>
     );

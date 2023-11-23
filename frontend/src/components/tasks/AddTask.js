@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
+
 const AddTask = ({ showModal, handleClose, handleAddTask }) => {
 
     const [formData, setFormData] = useState({
@@ -45,9 +46,10 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                         <Form.Control
                             type="text"
                             name="taskName"
-                            value={formData.name}
-                            onChange={handleChange}
                             placeholder="Enter task name"
+                            value={formData.taskName}
+                            onChange={handleChange}
+
                         />
                     </Form.Group>
 
@@ -56,9 +58,9 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                         <Form.Control
                             as="textarea"
                             name="description"
+                            placeholder="Enter task description"
                             value={formData.description}
                             onChange={handleChange}
-                            placeholder="Enter task description"
                         />
                     </Form.Group>
 

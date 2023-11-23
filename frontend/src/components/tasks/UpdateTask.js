@@ -95,22 +95,22 @@ const UpdateTask = () => {
 
     return (
         <Container className="mt-4">
-            <h2 className="text-center">Aufgabe bearbeiten</h2>
+            <h2 className="text-center">Edit Task</h2>
             <Card>
                 <Card.Body>
                     <Form>
-                        <Form.Group controlId="formTaskName">
-                            <Form.Label>Task Name</Form.Label>
+                        <Form.Group controlId="formTaskName" className="mt-4">
+                            <Form.Label>Task Name:</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Enter task name"
                                 name="taskName"
+                                placeholder="Enter task name"
                                 value={updatedTask.taskName || ''}
                                 onChange={handleInputChange}
                             />
                         </Form.Group>
 
-                        <Form.Group controlId="formDescription">
+                        <Form.Group controlId="formDescription" className="mt-4">
                             <Form.Label>Description</Form.Label>
                             <Form.Control
                                 as="textarea"
@@ -121,7 +121,7 @@ const UpdateTask = () => {
                             />
                         </Form.Group>
 
-                        <Form.Group controlId="formDueDate">
+                        <Form.Group controlId="formDueDate" className="mt-4">
                             <Form.Label>Due Date</Form.Label>
                             <Form.Control
                                 type="datetime-local"
@@ -131,7 +131,7 @@ const UpdateTask = () => {
                             />
                         </Form.Group>
 
-                        <Form.Group controlId="formCompleted">
+                        <Form.Group controlId="formCompleted" className="mt-4">
                             <Form.Check
                                 type="checkbox"
                                 label="Completed"
@@ -141,9 +141,11 @@ const UpdateTask = () => {
                             />
                         </Form.Group>
 
-                        <Button variant="primary" onClick={handleUpdateTask}>
-                            Update Task
-                        </Button>
+                        <div className="d-flex justify-content-center m-4">
+                            <Button variant="success" onClick={handleUpdateTask}  type="submit" className="rounded-pill">
+                                Update Task
+                            </Button>
+                        </div>
 
                     </Form>
                 </Card.Body>
