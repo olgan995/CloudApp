@@ -27,17 +27,22 @@ const AllTasks = () => {
         fetchTasks();
     }, []);
 
+    // State to manage the visibility of a modal/dialog
     const [showModal, setShowModal] = useState(false);
+    // Function to show the modal/dialog
     const handleShow = () => setShowModal(true);
+    // Function to close the modal/dialog
     const handleClose = () => setShowModal(false);
+    // Function to handle the addition of a new task
     const handleAddTask = async (formData) => {
         try {
             const response = await api.createTask(formData);
             console.log('Task created:', response.data);
 
+            // Closing the modal/dialog after successfully adding a task
             handleClose();
 
-            // Fetch tasks again after adding a new task
+            // Fetching the updated list of tasks after adding a new task
             const updatedTasks = await api.getAllTasks();
             setTasks(updatedTasks.data);
 
