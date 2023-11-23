@@ -8,8 +8,9 @@ const Layout = ({ children }) => {
             <header className="text-center">
                 <nav className="navbar navbar-expand-lg navbar-light bg-dark">
                     <div className="container-fluid d-flex justify-content-between align-items-center">
-                        <div className="text-center">
-                            <h1 className="navbar-brand text-light">Todo Board</h1>
+                        <div className="text-center flex-grow-1">
+                            <h1 className="navbar-brand text-light">ToDo Board</h1>
+                            <button className="btn btn-primary mt-2">Add Task</button>
                         </div>
                         <div>
                             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

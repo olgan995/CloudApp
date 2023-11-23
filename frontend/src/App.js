@@ -1,6 +1,7 @@
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Layout from "./components/layout/Layout";
 import Login from "./components/auth/Login";
@@ -9,10 +10,11 @@ import Logout from "./components/auth/Logout";
 import AllTasks from "./components/tasks/AllTasks";
 import { setAuthToken } from './services/api';
 import PrivateRoute from "./components/auth/PrivateRoute";
+import Test from "./components/tasks/Test";
+import UpdateTask from "./components/tasks/UpdateTask";
 
 const App = () => {
-    // Check if the user has a token on app load and set it in the API module
-    React.useEffect(() => {
+    useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
             setAuthToken(token);
@@ -23,7 +25,6 @@ const App = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<Login />} />
-                <Route path="*" element={<Login />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/logout" element={<Logout />} />
@@ -35,6 +36,8 @@ const App = () => {
                         )} />
                     )}
                 />
+                <Route path="/update-task/:taskId" element={<PrivateRoute element={<UpdateTask />} />} />
+                <Route path="/test" element={<Layout> <Test /> </Layout>} />
             </Routes>
         </Router>
     );

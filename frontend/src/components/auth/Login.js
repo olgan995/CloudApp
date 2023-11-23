@@ -20,6 +20,7 @@ const Login = () => {
     };
 
     const handleLogin = async (e) => {
+        console.log("handle Login")
         e.preventDefault();
         try {
             const response = await api.loginUser(userData);
@@ -86,7 +87,7 @@ const Login = () => {
                         />
                     </Form.Group>
 
-                    <Button variant="primary" type="submit" onClick={handleLogin} className="rounded-pill">
+                    <Button variant="primary" type="submit" onClick={handleLogin}>
                         Login
                     </Button>
 
