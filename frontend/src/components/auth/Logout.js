@@ -15,11 +15,6 @@ const Logout = () => {
         }
     }, [location.state]);
 
-    const clearAuthentication = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('logoutSuccessMessage');
-    };
-
     const handleLogout = () => {
         logoutUser();
         navigate('/login', { state: { successMessage: 'Logout successful. Please login again!' } });
