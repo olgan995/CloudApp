@@ -34,7 +34,11 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         <Modal
             show={showModal}
             onHide={handleClose}
-            style={{ marginLeft: '0', transform: 'translateX(-32%)' }}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
         >
             <Modal.Header closeButton >
                 <Modal.Title className="w-100 text-center">Add New Task</Modal.Title>
