@@ -8,12 +8,17 @@ import com.haw.task.common.TaskNotFoundException;
 import com.haw.task.common.ForbiddenOperationException;
 import com.haw.task.dataaccess.api.entity.Task;
 import com.haw.task.dataaccess.api.repo.TaskRepository;
+import com.haw.task.logic.impl.SpeechToTextService;
 import com.haw.task.logic.impl.TaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/tasks")
@@ -29,6 +34,9 @@ public class TaskController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    SpeechToTextService speechToTextService;
 
 
     @GetMapping
@@ -49,6 +57,23 @@ public class TaskController {
         return ResponseEntity.status(201).body(newTask);
     }
 
+    @PostMapping("/transcriptions")
+    public ResponseEntity<Map<String, String>> transcribeAudio(@RequestParam("audioFile") MultipartFile audioFile) {
+        //transcription logic
+        try {
+            byte[] audioData = audioFile.getBytes();
+            String transcription = speechToTextService.transcribe(audioData);
+
+            // map to structure the response
+            Map<String, String> response = new HashMap<>();
+            response.put("transcription", transcription);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @PatchMapping("/{taskId}")
     public ResponseEntity<Task> updateTask(@PathVariable Long taskId, @RequestBody TaskDto task)
             throws UserNotFoundByUsernameException, TaskNotFoundException, ForbiddenOperationException {
@@ -62,11 +87,7 @@ public class TaskController {
 
         try {
             taskService.deleteTask(taskId);
-        } catch (TaskNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (UserNotFoundByUsernameException e) {
-            throw new RuntimeException(e);
-        } catch (ForbiddenOperationException e) {
+        } catch (TaskNotFoundException | ForbiddenOperationException | UserNotFoundByUsernameException e) {
             throw new RuntimeException(e);
         }
 
