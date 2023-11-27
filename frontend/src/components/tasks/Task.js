@@ -32,8 +32,7 @@ const Task = (props) => {
                     </div>
 
                     <div className="d-flex justify-content-between mt-auto">
-
-                        <Link to={{ pathname: `/update-task/${task.id}`, state: { task } }}>
+                        <Link to={`/update-task/${task.id}`}>
                             <Button
                                 className="rounded-pill w-45"
                                 size="sm"
@@ -45,9 +44,11 @@ const Task = (props) => {
                             className="rounded-pill w-45"
                             variant="danger"
                             size="sm"
-                            onClick={() => handleDelete(task.id)}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                handleDelete(task.id);
+                            }}
                         >Delete</Button>
-
                     </div>
 
                 </Card.Body>

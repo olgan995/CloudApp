@@ -6,7 +6,7 @@ import '../styles/global.css';
 
 const TaskDetails = () => {
     const [task, setTask] = useState(null);
-    const { taskId } = useParams();
+    const { id } = useParams();
 
     useEffect(() => {
         const fetchTask = async () => {
@@ -14,8 +14,8 @@ const TaskDetails = () => {
                 const token = localStorage.getItem('token');
                 if (token) {
                     setAuthToken(token);
-                    if (taskId) {
-                        const response = await getTaskById(taskId);
+                    if (id) {
+                        const response = await getTaskById(id);
                         setTask(response.data);
                     }
                 }
@@ -25,7 +25,7 @@ const TaskDetails = () => {
         };
 
         fetchTask();
-    }, [taskId]);
+    }, [id]);
 
     if (!task) {
         return <div>Loading...</div>;
