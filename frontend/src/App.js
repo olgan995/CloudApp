@@ -10,6 +10,7 @@ import AllTasks from "./components/tasks/AllTasks";
 import { setAuthToken } from './services/api';
 import PrivateRoute from "./components/auth/PrivateRoute";
 import UpdateTask from "./components/tasks/UpdateTask";
+import TaskDetails from "./components/tasks/TaskDetails";
 
 const App = () => {
     useEffect(() => {
@@ -35,6 +36,13 @@ const App = () => {
                     )}
                 />
                 <Route path="/update-task/:taskId" element={<PrivateRoute element={<UpdateTask />} />} />
+                <Route path="/task/:taskId"
+                       element={(
+                           <PrivateRoute element={(
+                               <Layout> <TaskDetails /> </Layout>
+                           )} />
+                       )}
+                />
             </Routes>
         </Router>
     );
