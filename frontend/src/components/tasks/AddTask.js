@@ -71,7 +71,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                     <Form.Group controlId="taskDueDate" className="mt-3">
                         <Form.Label>Due Date:</Form.Label>
                         <Form.Control
-                            type="date"
+                            type="datetime-local"
                             name="dueDate"
                             value={formData.dueDate}
                             onChange={handleChange}
