@@ -7,6 +7,15 @@ import '../styles/global.css';
 const TaskDetails = () => {
     const [task, setTask] = useState(null);
     const { id } = useParams();
+    const options = {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        timeZone: 'UTC'
+    };
 
     useEffect(() => {
         const fetchTask = async () => {
@@ -35,22 +44,21 @@ const TaskDetails = () => {
         <div className="task-details-container">
             <Card className="task-details-card">
                 <Card.Body>
-                    <Card.Title>{task.taskName || 'N/A'}</Card.Title>
-                    <Card.Text>{task.description}</Card.Text>
-                    <Card.Text>Due Date: {new Date(task.dueDate).toLocaleString()}</Card.Text>
+                    <Card.Title className="mb-3">{task.taskName || 'N/A'}</Card.Title>
+                    <Card.Text className="text-muted">{task.description}</Card.Text>
+                    <Card.Text>Due Date: {new Date(task.dueDate).toLocaleString('de-DE', options)}</Card.Text>
                     <Card.Text>Status: {task.completed ? 'Completed' : 'Incomplete'}</Card.Text>
                 </Card.Body>
             </Card>
 
             <div className="text-center mt-4">
                 <Link to="/tasks">
-                    <Button variant="primary" className="rounded-pill btn-lg" >All Tasks</Button>
+                    <Button variant="primary" className="rounded-pill btn-lg">
+                        All Tasks
+                    </Button>
                 </Link>
             </div>
-
         </div>
-
-
     );
 };
 
