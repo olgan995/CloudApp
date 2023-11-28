@@ -9,7 +9,8 @@ import Logout from "./components/auth/Logout";
 import AllTasks from "./components/tasks/AllTasks";
 import { setAuthToken } from './services/api';
 import PrivateRoute from "./components/auth/PrivateRoute";
-import UpdateTask from "./components/tasks/UpdateTask";
+import TaskDetails from "./components/tasks/TaskDetails";
+import EditTask from "./components/tasks/EditTask";
 
 const App = () => {
     useEffect(() => {
@@ -34,7 +35,22 @@ const App = () => {
                         )} />
                     )}
                 />
-                <Route path="/update-task/:taskId" element={<PrivateRoute element={<UpdateTask />} />} />
+
+                <Route path="/task/:id"
+                       element={(
+                           <PrivateRoute element={(
+                               <Layout> <TaskDetails /> </Layout>
+                           )} />
+                       )}
+                />
+
+                <Route path="/update-task/:id"
+                       element={(
+                           <PrivateRoute element={(
+                               <Layout> <EditTask /> </Layout>
+                           )} />
+                       )}
+                />
             </Routes>
         </Router>
     );

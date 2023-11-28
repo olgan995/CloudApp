@@ -34,7 +34,11 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         <Modal
             show={showModal}
             onHide={handleClose}
-            style={{ marginLeft: '0', transform: 'translateX(-32%)' }}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
         >
             <Modal.Header closeButton >
                 <Modal.Title className="w-100 text-center">Add New Task</Modal.Title>
@@ -67,7 +71,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                     <Form.Group controlId="taskDueDate" className="mt-3">
                         <Form.Label>Due Date:</Form.Label>
                         <Form.Control
-                            type="date"
+                            type="datetime-local"
                             name="dueDate"
                             value={formData.dueDate}
                             onChange={handleChange}
