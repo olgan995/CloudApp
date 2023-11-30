@@ -42,6 +42,8 @@ dependencies {
 
     //GCP
     implementation group: 'com.google.cloud', name: 'spring-cloud-gcp-starter-sql-postgresql', version: '2.0.4'
+    implementation 'com.google.cloud:google-cloud-secretmanager:2.8.0'
+    implementation 'com.google.cloud:google-cloud-speech:4.25.0'
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
