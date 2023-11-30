@@ -8,6 +8,7 @@ import com.haw.task.common.TaskNotFoundException;
 import com.haw.task.common.ForbiddenOperationException;
 import com.haw.task.dataaccess.api.entity.Task;
 import com.haw.task.dataaccess.api.repo.TaskRepository;
+import com.haw.task.logic.impl.AudioUtils;
 import com.haw.task.logic.impl.SpeechToTextService;
 import com.haw.task.logic.impl.TaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,8 +62,12 @@ public class TaskController {
     public ResponseEntity<Map<String, String>> transcribeAudio(@RequestParam("audioFile") MultipartFile audioFile) {
         //transcription logic
         try {
-            byte[] audioData = audioFile.getBytes();
-            String transcription = speechToTextService.transcribe(audioData);
+            byte[] stereoAudioData = audioFile.getBytes();
+
+            // Convert stereo to mono
+            byte[] monoAudioData = AudioUtils.convertStereoToMono(stereoAudioData);
+
+            String transcription = speechToTextService.transcribe(monoAudioData);
 
             // map to structure the response
             Map<String, String> response = new HashMap<>();
@@ -70,6 +75,7 @@ public class TaskController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
