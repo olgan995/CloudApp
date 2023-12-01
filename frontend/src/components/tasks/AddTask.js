@@ -9,6 +9,20 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         dueDate: '',
         completed: false
     });
+    const [recording, setRecording] = useState(false); // Zustand für die Aufnahme
+    const handleRecord = () => {
+        // Implementieren Sie hier die Logik für die Sprachaufnahme
+        // Beachten Sie, dass Sie möglicherweise eine externe Bibliothek oder ein API verwenden müssen.
+        // Hier ist ein Beispiel, wie Sie die Aufnahme mit Web-APIs starten könnten:
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then((stream) => {
+                setRecording(true);
+                // Hier können Sie die Logik für die Aufnahme des Audiostreams implementieren
+            })
+            .catch((error) => {
+                console.error('Error accessing microphone:', error);
+            });
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -67,6 +81,14 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                             onChange={handleChange}
                         />
                     </Form.Group>
+
+                    <Button
+                        variant={recording ? 'danger' : 'primary'}
+                        className="rounded-pill mt-3"
+                        onClick={recording ? () => setRecording(false) : handleRecord}
+                    >
+                        {recording ? 'Stop Recording' : 'Start Recording'}
+                    </Button>
 
                     <Form.Group controlId="taskDueDate" className="mt-3">
                         <Form.Label>Due Date:</Form.Label>
