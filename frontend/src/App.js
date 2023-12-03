@@ -36,7 +36,7 @@ const App = () => {
                     )}
                 />
 
-                <Route path="/task/:id"
+                <Route path="/tasks/:id"
                        element={(
                            <PrivateRoute element={(
                                <Layout> <TaskDetails /> </Layout>
