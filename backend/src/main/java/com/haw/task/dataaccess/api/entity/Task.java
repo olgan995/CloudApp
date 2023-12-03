@@ -2,6 +2,7 @@ package com.haw.task.dataaccess.api.entity;
 
 import com.haw.appuser.dataaccess.api.entity.AppUser;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -23,6 +24,7 @@ public class Task {
 
     private String taskName;
     private String description;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dueDate;
     private boolean completed;
     private Long ownerId;
