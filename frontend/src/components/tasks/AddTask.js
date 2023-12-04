@@ -1,5 +1,7 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
+import {transcribeAudioFile} from "../../services/api";
+import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 
 const AddTask = ({ showModal, handleClose, handleAddTask }) => {
 
@@ -9,20 +11,9 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         dueDate: '',
         completed: false
     });
-    const [recording, setRecording] = useState(false); // Zustand für die Aufnahme
-    const handleRecord = () => {
-        // Implementieren Sie hier die Logik für die Sprachaufnahme
-        // Beachten Sie, dass Sie möglicherweise eine externe Bibliothek oder ein API verwenden müssen.
-        // Hier ist ein Beispiel, wie Sie die Aufnahme mit Web-APIs starten könnten:
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then((stream) => {
-                setRecording(true);
-                // Hier können Sie die Logik für die Aufnahme des Audiostreams implementieren
-            })
-            .catch((error) => {
-                console.error('Error accessing microphone:', error);
-            });
-    };
+    const [recording, setRecording] = useState(false);
+    const audioChunksRef = useRef([]);
+    const mediaRecorderRef = useRef(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -42,6 +33,76 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
             dueDate: '',
             completed: false
         });
+    };
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorderRef.current = new MediaRecorder(stream);
+            audioChunksRef.current = [];
+
+            mediaRecorderRef.current.ondataavailable = (e) => {
+                if (e.data.size) {
+                    audioChunksRef.current.push(e.data);
+                }
+            };
+
+
+            mediaRecorderRef.current.onstop = async () => {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+                setFormData((prevData) => ({
+                    ...prevData,
+                    audioFile: audioBlob, // Save the recorded audio as a File in the form data
+                }));
+                audioChunksRef.current = [];
+
+                // FormData
+                const formData = new FormData();
+                formData.append('audioFile', audioBlob, 'audioFile.wav');
+
+/*                const headers = {
+                    'Content-type': 'multipart/form-data; boundary=${formData._boundary}'
+                };*/
+
+                // Send the recorded audio to the backend for transcription
+                try {
+                    const transcription = await transcribeAudioFile(audioBlob);
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        description: transcription, // Update description with transcription result
+                    }));
+                } catch (error) {
+                    if (error.response && error.response.status === 500) {
+                        handleRecordingError(error);
+                    } else {
+                        console.error('Error:', error);
+                    }
+                }
+            };
+
+            mediaRecorderRef.current.start();
+            setRecording(true);
+
+            setTimeout(() => {
+                if (mediaRecorderRef.current.state !== 'inactive') {
+                    mediaRecorderRef.current.stop();
+                    setRecording(false);
+                }
+            }, 60000); // Stop recording after 1 minute (60 seconds)
+        } catch (error) {
+            console.error('Error accessing the microphone:', error);
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+            mediaRecorderRef.current.stop();
+            setRecording(false);
+        }
+    };
+
+    const handleRecordingError = (error) => {
+        console.error('Server Error:', error);
     };
 
     return (
@@ -67,7 +128,6 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                             placeholder="Enter task name"
                             value={formData.taskName}
                             onChange={handleChange}
-
                         />
                     </Form.Group>
 
@@ -82,13 +142,24 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                         />
                     </Form.Group>
 
-                    <Button
-                        variant={recording ? 'danger' : 'primary'}
-                        className="rounded-pill mt-3"
-                        onClick={recording ? () => setRecording(false) : handleRecord}
-                    >
-                        {recording ? 'Stop Recording' : 'Start Recording'}
-                    </Button>
+                    <div className="d-flex justify-content-center">
+                        <Form.Group controlId="audioRecording" className="mt-3">
+                            <Button className="rounded-pill"
+                                variant={recording ? 'danger' : 'primary'}
+                                onClick={recording ? stopRecording : startRecording}
+                            >
+                                {recording ? (
+                                    <>
+                                        <FaMicrophoneSlash /> Stop
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaMicrophone /> Start
+                                    </>
+                                )}
+                            </Button>
+                        </Form.Group>
+                    </div>
 
                     <Form.Group controlId="taskDueDate" className="mt-3">
                         <Form.Label>Due Date:</Form.Label>
