@@ -60,6 +60,26 @@ export const getTaskById = (taskId) => api.get(`/tasks/${taskId}`);
 export const updateTask = (taskId, taskData) => api.patch(`/tasks/${taskId}`, taskData);
 export const deleteTask = (taskId) => api.delete(`/tasks/${taskId}`);
 
+export const transcribeAudioFile = (audioFile) => {
+    return api.post('/tasks/transcriptions', audioFile, {
+/*        headers: {
+            'Content-Type': 'audio/wav',
+        },*/
+       //headers: {'Content-Type': 'multipart/form-data'}
+    })
+    .then(response => {
+        if (response.status === 200) {
+            return response.data;
+        } else {
+            throw new Error('Transcription failed');
+        }
+    })
+    .catch(error => {
+        console.error('Error transcribing audio:', error);
+        throw error;
+    });
+};
+
 const apis = {
     registerUser,
     loginUser,
@@ -69,6 +89,7 @@ const apis = {
     getTaskById,
     updateTask,
     deleteTask,
+    transcribeAudioFile,
 };
 
 export default apis;
