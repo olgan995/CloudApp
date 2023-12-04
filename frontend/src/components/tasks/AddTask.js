@@ -55,14 +55,6 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                 }));
                 audioChunksRef.current = [];
 
-                // FormData
-                const formData = new FormData();
-                formData.append('audioFile', audioBlob, 'audioFile.wav');
-
-/*                const headers = {
-                    'Content-type': 'multipart/form-data; boundary=${formData._boundary}'
-                };*/
-
                 // Send the recorded audio to the backend for transcription
                 try {
                     const transcription = await transcribeAudioFile(audioBlob);
@@ -71,11 +63,8 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                         description: transcription, // Update description with transcription result
                     }));
                 } catch (error) {
-                    if (error.response && error.response.status === 500) {
-                        handleRecordingError(error);
-                    } else {
-                        console.error('Error:', error);
-                    }
+                    console.error('Error accessing the microphone or starting recording:', error);
+                    console.error('Error:', error);
                 }
             };
 
@@ -98,10 +87,6 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
             mediaRecorderRef.current.stop();
             setRecording(false);
         }
-    };
-
-    const handleRecordingError = (error) => {
-        console.error('Server Error:', error);
     };
 
     return (
@@ -144,8 +129,8 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                     <div className="d-flex justify-content-center">
                         <Form.Group controlId="audioRecording" className="mt-3">
                             <Button className="rounded-pill"
-                                variant={recording ? 'danger' : 'primary'}
-                                onClick={recording ? stopRecording : startRecording}
+                                    variant={recording ? 'danger' : 'primary'}
+                                    onClick={recording ? stopRecording : startRecording}
                             >
                                 {recording ? (
                                     <>
