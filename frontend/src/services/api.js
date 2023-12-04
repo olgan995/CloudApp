@@ -60,7 +60,31 @@ export const getTaskById = (taskId) => api.get(`/tasks/${taskId}`);
 export const updateTask = (taskId, taskData) => api.patch(`/tasks/${taskId}`, taskData);
 export const deleteTask = (taskId) => api.delete(`/tasks/${taskId}`);
 
-export const transcribeAudioFile = (audioFile) => {
+export const transcribeAudioFile = async (audioFile) => {
+    try {
+        const token = localStorage.getItem('token');
+        setAuthToken(token);
+
+        console.log('Sending request with data:', audioFile);
+
+        const formData = new FormData();
+        formData.append('audioFile', audioFile, 'audioFile.wav');
+
+        const response = await api.post('/tasks/transcriptions', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error('Error transcribing audio:', error);
+        throw error;
+    }
+};
+
+
+export const transcribeAudioFile2 = (audioFile) => {
     return api.post('/tasks/transcriptions', audioFile, {
 /*        headers: {
             'Content-Type': 'audio/wav',
