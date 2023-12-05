@@ -48,7 +48,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
             };
 
             mediaRecorderRef.current.onstop = async () => {
-                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio.wav' });
                 setFormData((prevData) => ({
                     ...prevData,
                     audioFile: audioBlob, // Save the recorded audio as a File in the form data

@@ -75,7 +75,7 @@ export const transcribeAudioFile = async (audioFile) => {
 
         const response = await api.post('/tasks/transcriptions', formData, {
             headers: {
-                'Content-Type': 'multipart/form-data',
+                "Content-Type" : 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
             },
         });
 
