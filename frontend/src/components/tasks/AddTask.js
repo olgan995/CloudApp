@@ -73,16 +73,22 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
     };
 
     const handleSendAudio = async () => {
-        console.log("start handleSendAudio")
-        if (audioChunks.length === 0) {
+        console.log("Starting handleSendAudio")
+/*        if (audioChunks.length === 0) {
             console.warn('No audio recorded.');
             return;
-        }
+        }*/
 
         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
         const formData = new FormData();
         formData.append('audioFile', audioBlob, 'recording.wav');
         setAudioChunks([]);
+
+        // Log the FormData object before making the API call
+        console.log('FormData:', formData);
+        formData.forEach((value, key) => {
+            console.log(key, value);
+        });
 
         const audioUrl = URL.createObjectURL(audioBlob);
         setAudioUrl(audioUrl);
@@ -170,12 +176,6 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                     <div className="d-flex justify-content-center mt-4">
                         <Button variant="success" type="submit" className="rounded-pill">
                             Save Task
-                        </Button>
-                    </div>
-
-                    <div className="d-flex justify-content-center mt-4">
-                        <Button className="rounded-pill" onClick={() => handleSendAudio()}>
-                            Send
                         </Button>
                     </div>
 
