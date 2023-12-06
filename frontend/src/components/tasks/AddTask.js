@@ -2,6 +2,7 @@ import React, {useRef, useState} from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
 import {transcribeAudioFile} from "../../services/api";
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
+import '../styles/global.css';
 
 const AddTask = ({ showModal, handleClose, handleAddTask }) => {
 
@@ -101,10 +102,6 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
             console.log(key, value);
         });
 
-        const audioUrl = URL.createObjectURL(audioBlob);
-        setAudioUrl(audioUrl);
-        setAudioChunks([]); // Clear audioChunks after sending the audio
-
         // Send the recorded audio to the backend for transcription
         try {
             const transcription = await transcribeAudioFile(formData);
@@ -112,8 +109,52 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                 ...prevData,
                 description: transcription, // Update description with transcription result
             }));
+            console.log("transcription", transcription)
         } catch (error) {
             console.error('Error transcribing audio:', error);
+        }
+    };
+
+    // Function to Upload Audio
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFileName, setSelectedFileName] = useState('');
+
+    // Function to handle file change
+    const handleFileChange = (event) => {
+        const fileInput = event.target;
+        const selectedFile = fileInput.files[0];
+        setSelectedFile(selectedFile); // Update the state with the selected file
+
+        // Update the selected file name in the state
+        if (selectedFile) {
+            setSelectedFileName(selectedFile.name);
+        } else {
+            setSelectedFileName(''); // If no file selected, reset the selected file name
+        }
+    };
+
+    const handleFileUpload = async () => {
+        if (!selectedFile) {
+            console.warn('No file selected.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('audioFile', selectedFile);
+
+        // Send the recorded audio to the backend for transcription
+        try {
+            const response = await transcribeAudioFile(formData);
+            // Destructure 'transcription' from the response
+            const { transcription } = response;
+
+            setFormData((prevData) => ({
+                ...prevData,
+                description: transcription,
+            }));
+            console.log('File uploaded successfully!', transcription);
+        } catch (error) {
+            console.error('Error uploading file:', error);
         }
     };
 
@@ -149,6 +190,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                             as="textarea"
                             name="description"
                             placeholder="Enter task description"
+                            className="custom-textarea"
                             value={formData.description}
                             onChange={handleChange}
                         />
@@ -173,6 +215,40 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                         </Form.Group>
                     </div>
 
+                    <div className="d-flex justify-content-center">
+                        <Form.Group controlId="audioRecording" className="mt-3">
+                            <input
+                                type="file"
+                                id="fileInput"
+                                className="input-file"
+                                onChange={handleFileChange}
+                                accept="audio/*"
+                            />
+                            <label htmlFor="fileInput" className="custom-file-upload">
+                                <span>Choose File</span>
+                            </label>
+
+                            <span id="fileNameDisplay">{selectedFileName}</span>
+
+                            <Button className="rounded-pill ml-2"
+                                    onClick={handleFileUpload}
+                                    disabled={!selectedFile}>
+                                Upload File
+                            </Button>
+                        </Form.Group>
+                    </div>
+                    <div className="d-flex center m-3">
+                        <audio controls src={audioUrl} />
+                        <Button
+                            href={audioUrl}
+                            variant="secondary"
+                            className="rounded-pill"
+                            download="recording.wav">
+                            Download
+                        </Button>
+                    </div>
+
+
                     <Form.Group controlId="taskDueDate" className="mt-3">
                         <Form.Label>Due Date:</Form.Label>
                         <Form.Control
@@ -186,17 +262,6 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                     <div className="d-flex justify-content-center mt-4">
                         <Button variant="success" type="submit" className="rounded-pill">
                             Save Task
-                        </Button>
-                    </div>
-
-                    <div className="d-flex justify-content-center mt-4">
-                        <audio controls src={audioUrl} />
-                        <Button
-                            href={audioUrl}
-                            variant="secondary"
-                            className="rounded-pill"
-                            download="recording.wav">
-                            Download
                         </Button>
                     </div>
 
