@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
 import {transcribeAudioFile} from "../../services/api";
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
@@ -12,6 +12,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         completed: false
     });
 
+    // Function to handle changes in form fields
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -20,6 +21,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         }));
     };
 
+    // Function to handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
         handleAddTask(formData);
@@ -32,16 +34,32 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         });
     };
 
+    // Audio recording functionality
     const [isRecording, setIsRecording] = useState(false);
     const [audioChunks, setAudioChunks] = useState([]);
     const mediaRecorderRef = useRef(null);
     const streamRef = useRef(null);
     const [audioUrl, setAudioUrl] = useState('');
 
+    const handleDataAvailable = (event) => {
+        if (event.data.size > 0) {
+            setAudioChunks((prevChunks) => [...prevChunks, event.data]);
+            console.log('Received audio chunk:', event.data);
+
+            const audioBlob = new Blob([...audioChunks, event.data], { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            setAudioUrl(audioUrl);
+        }
+    };
+
     const startRecording = async () => {
         try {
+            // Clear previous audio chunks before starting a new recording
+            setAudioChunks([]);
+
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             streamRef.current = stream;
+
             const mediaRecorder = new MediaRecorder(stream);
             mediaRecorder.ondataavailable = handleDataAvailable;
             mediaRecorderRef.current = mediaRecorder;
@@ -63,21 +81,14 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         }
     };
 
-    const handleDataAvailable = (event) => {
-        if (event.data.size > 0) {
-            setAudioChunks([...audioChunks, event.data]);
-            const audioBlob = new Blob([...audioChunks, event.data], { type: 'audio/wav' });
-            const audioUrl = URL.createObjectURL(audioBlob);
-            setAudioUrl(audioUrl);
-        }
-    };
-
     const handleSendAudio = async () => {
-        console.log("Starting handleSendAudio")
-/*        if (audioChunks.length === 0) {
+        console.log("Starting handleSendAudio()");
+        console.log("Audio chunks length:", audioChunks.length);
+
+        if (audioChunks.length === 0) {
             console.warn('No audio recorded.');
             return;
-        }*/
+        }
 
         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
         const formData = new FormData();
@@ -102,8 +113,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                 description: transcription, // Update description with transcription result
             }));
         } catch (error) {
-            console.error('Error accessing the microphone or starting recording:', error);
-            console.error('Error:', error);
+            console.error('Error transcribing audio:', error);
         }
     };
 
