@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
 import {transcribeAudioFile} from "../../services/api";
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
@@ -11,9 +11,6 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         dueDate: '',
         completed: false
     });
-    const [recording, setRecording] = useState(false);
-    const audioChunksRef = useRef([]);
-    const mediaRecorderRef = useRef(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -35,57 +32,72 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         });
     };
 
+    const [isRecording, setIsRecording] = useState(false);
+    const [audioChunks, setAudioChunks] = useState([]);
+    const mediaRecorderRef = useRef(null);
+    const streamRef = useRef(null);
+    const [audioUrl, setAudioUrl] = useState('');
+
     const startRecording = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorderRef.current = new MediaRecorder(stream);
-            audioChunksRef.current = [];
-
-            mediaRecorderRef.current.ondataavailable = (e) => {
-                if (e.data.size) {
-                    audioChunksRef.current.push(e.data);
-                }
-            };
-
-            mediaRecorderRef.current.onstop = async () => {
-                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio.wav' });
-                setFormData((prevData) => ({
-                    ...prevData,
-                    audioFile: audioBlob, // Save the recorded audio as a File in the form data
-                }));
-                audioChunksRef.current = [];
-
-                // Send the recorded audio to the backend for transcription
-                try {
-                    const transcription = await transcribeAudioFile(audioBlob);
-                    setFormData((prevData) => ({
-                        ...prevData,
-                        description: transcription, // Update description with transcription result
-                    }));
-                } catch (error) {
-                    console.error('Error accessing the microphone or starting recording:', error);
-                    console.error('Error:', error);
-                }
-            };
-
-            mediaRecorderRef.current.start();
-            setRecording(true);
-
-            setTimeout(() => {
-                if (mediaRecorderRef.current.state !== 'inactive') {
-                    mediaRecorderRef.current.stop();
-                    setRecording(false);
-                }
-            }, 60000); // Stop recording after 1 minute (60 seconds)
-        } catch (error) {
-            console.error('Error accessing the microphone:', error);
+            streamRef.current = stream;
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = handleDataAvailable;
+            mediaRecorderRef.current = mediaRecorder;
+            mediaRecorder.start();
+            setIsRecording(true);
+        } catch (err) {
+            console.error('Error accessing microphone:', err);
         }
     };
 
     const stopRecording = () => {
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        if (mediaRecorderRef.current) {
             mediaRecorderRef.current.stop();
-            setRecording(false);
+            streamRef.current.getTracks().forEach((track) => track.stop());
+            setIsRecording(false);
+            handleSendAudio();
+        } else {
+            console.log("failed")
+        }
+    };
+
+    const handleDataAvailable = (event) => {
+        if (event.data.size > 0) {
+            setAudioChunks([...audioChunks, event.data]);
+            const audioBlob = new Blob([...audioChunks, event.data], { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            setAudioUrl(audioUrl);
+        }
+    };
+
+    const handleSendAudio = async () => {
+        console.log("start handleSendAudio")
+        if (audioChunks.length === 0) {
+            console.warn('No audio recorded.');
+            return;
+        }
+
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const formData = new FormData();
+        formData.append('audioFile', audioBlob, 'recording.wav');
+        setAudioChunks([]);
+
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioUrl(audioUrl);
+        setAudioChunks([]); // Clear audioChunks after sending the audio
+
+        // Send the recorded audio to the backend for transcription
+        try {
+            const transcription = await transcribeAudioFile(formData);
+            setFormData((prevData) => ({
+                ...prevData,
+                description: transcription, // Update description with transcription result
+            }));
+        } catch (error) {
+            console.error('Error accessing the microphone or starting recording:', error);
+            console.error('Error:', error);
         }
     };
 
@@ -129,10 +141,10 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                     <div className="d-flex justify-content-center">
                         <Form.Group controlId="audioRecording" className="mt-3">
                             <Button className="rounded-pill"
-                                    variant={recording ? 'danger' : 'primary'}
-                                    onClick={recording ? stopRecording : startRecording}
+                                    variant={isRecording ? 'danger' : 'primary'}
+                                    onClick={isRecording ? stopRecording : startRecording}
                             >
-                                {recording ? (
+                                {isRecording ? (
                                     <>
                                         <FaMicrophoneSlash /> Stop
                                     </>
@@ -158,6 +170,23 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                     <div className="d-flex justify-content-center mt-4">
                         <Button variant="success" type="submit" className="rounded-pill">
                             Save Task
+                        </Button>
+                    </div>
+
+                    <div className="d-flex justify-content-center mt-4">
+                        <Button className="rounded-pill" onClick={() => handleSendAudio()}>
+                            Send
+                        </Button>
+                    </div>
+
+                    <div className="d-flex justify-content-center mt-4">
+                        <audio controls src={audioUrl} />
+                        <Button
+                            href={audioUrl}
+                            variant="secondary"
+                            className="rounded-pill"
+                            download="recording.wav">
+                            Download
                         </Button>
                     </div>
 
