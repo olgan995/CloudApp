@@ -60,7 +60,22 @@ export const getTaskById = (taskId) => api.get(`/tasks/${taskId}`);
 export const updateTask = (taskId, taskData) => api.patch(`/tasks/${taskId}`, taskData);
 export const deleteTask = (taskId) => api.delete(`/tasks/${taskId}`);
 
-export const transcribeAudioFile = async (audioFile) => {
+export const transcribeAudioFile = async (audioBlob) => {
+    try {
+        const response = await api.post('/tasks/transcriptions', audioBlob, {
+            headers: {
+                "Content-Type" : 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW',
+                //"Content-Type" : 'multipart/form-data'
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error transcribing audio:', error);
+        throw error;
+    }
+};
+
+export const transcribeAudioFile2 = async (audioFile) => {
     try {
         const token = localStorage.getItem('token');
         setAuthToken(token);
@@ -87,25 +102,25 @@ export const transcribeAudioFile = async (audioFile) => {
 };
 
 
-export const transcribeAudioFile2 = (audioFile) => {
+export const transcribeAudioFile3 = (audioFile) => {
     return api.post('/tasks/transcriptions', audioFile, {
-/*        headers: {
-            'Content-Type': 'audio/wav',
-        },*/
-       //headers: {'Content-Type': 'multipart/form-data'}
+        headers: {
+            "Content-Type" : 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW',
+        },
     })
-    .then(response => {
-        if (response.status === 200) {
-            return response.data;
-        } else {
-            throw new Error('Transcription failed');
-        }
-    })
-    .catch(error => {
-        console.error('Error transcribing audio:', error);
-        throw error;
-    });
+        .then(response => {
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                throw new Error('Transcription failed');
+            }
+        })
+        .catch(error => {
+            console.error('Error transcribing audio:', error);
+            throw error;
+        });
 };
+
 
 const apis = {
     registerUser,
