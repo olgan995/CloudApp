@@ -55,9 +55,6 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
 
     const startRecording = async () => {
         try {
-            // Clear previous audio chunks before starting a new recording
-            setAudioChunks([]);
-
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             streamRef.current = stream;
 
@@ -72,46 +69,53 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
     };
 
     const stopRecording = () => {
-        if (mediaRecorderRef.current) {
-            mediaRecorderRef.current.stop();
-            streamRef.current.getTracks().forEach((track) => track.stop());
-            setIsRecording(false);
-            handleSendAudio();
-        } else {
-            console.log("failed")
+        try {
+            if (mediaRecorderRef.current) {
+                mediaRecorderRef.current.stop();
+                streamRef.current.getTracks().forEach((track) => track.stop());
+                setIsRecording(false);
+                handleSendAudio();
+                setAudioChunks([]);
+            }
+        } catch (error) {
+            console.error('Error stopping recording:', error.message);
         }
     };
 
     const handleSendAudio = async () => {
-        console.log("Starting handleSendAudio()");
-        console.log("Audio chunks length:", audioChunks.length);
-
-        if (audioChunks.length === 0) {
-            console.warn('No audio recorded.');
-            return;
-        }
-
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        const formData = new FormData();
-        formData.append('audioFile', audioBlob, 'recording.wav');
-        setAudioChunks([]);
-
-        // Log the FormData object before making the API call
-        console.log('FormData:', formData);
-        formData.forEach((value, key) => {
-            console.log(key, value);
-        });
-
-        // Send the recorded audio to the backend for transcription
         try {
-            const transcription = await transcribeAudioFile(formData);
-            setFormData((prevData) => ({
-                ...prevData,
-                description: transcription, // Update description with transcription result
-            }));
-            console.log("transcription", transcription)
-        } catch (error) {
-            console.error('Error transcribing audio:', error);
+            console.log("Starting handleSendAudio()");
+            console.log("Audio chunks length:", audioChunks.length);
+
+            if (audioChunks.length === 0) {
+                console.warn('No audio recorded.');
+                return;
+            }
+
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const formData = new FormData();
+            formData.append('audioFile', audioBlob, 'recording.wav');
+
+            // Log the FormData object before making the API call
+            console.log('FormData:', formData);
+            formData.forEach((value, key) => {
+                console.log(key, value);
+            });
+
+            // Send the recorded audio to the backend for transcription
+            try {
+                const transcription = await transcribeAudioFile(formData);
+                setFormData((prevData) => ({
+                    ...prevData,
+                    description: transcription,
+                }));
+                console.log("transcription", transcription);
+            } catch (error) {
+                console.error('Error sending audio for transcription:', error);
+            }
+
+        }   catch (error) {
+            console.error('Error handling audio recording:', error);
         }
     };
 
