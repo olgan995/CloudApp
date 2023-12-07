@@ -85,13 +85,6 @@ paths:
             description: Bearer token
       description: Log out a user by invalidating their token.
       operationId: logoutUser
-      requestBody:
-        description: Data of new user
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthLogin'
-        required: true
       responses:
         '200':
           description: User logged out successfully
@@ -115,6 +108,13 @@ paths:
         - tasks
       summary: Get all tasks
       description: Get a list of all to-do tasks
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            description: Bearer token
       responses:
         "200":
           description: Successful Operation
@@ -131,6 +131,13 @@ paths:
         - tasks
       summary: Create a task
       description: Create a new to-do task
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            description: Bearer token
       requestBody:
         description: Task to be created
         content:
@@ -144,14 +151,60 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Task'
+                $ref: '#/components/schemas/TaskWithUser'
         "400":
           description: Bad Request
         "401":
           description: Unauthorized
 
+  /tasks/transcriptions:
+    parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+          description: Bearer token
+    post:
+      tags:
+        - tasks
+      summary: Upload audio file for transcription
+      requestBody:
+        description: Task to be created
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                audioFile:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Successful transcription
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transcription:
+                    type: string
+                    example: "the stale smell of old beer lingers it takes heat to bring out the odor a cold dip restores health and zest a salt pickle taste fine with ham tacos al Pastore are my favorite a zestful food is the hot cross bun"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+
+
   /tasks/{taskId}:
     parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+          description: Bearer token
       - name: taskId
         in: path
         required: true
@@ -164,14 +217,6 @@ paths:
         - tasks
       summary: Get a task by ID
       description: Get a specific to-do task by its ID
-      parameters:
-        - name: taskId
-          in: header
-          schema:
-            type: string
-            format: string18
-          required: true
-          description: ID of the task to retrieve
       responses:
         200:
           description: Task details
@@ -188,6 +233,13 @@ paths:
         - tasks
       summary: Update a task
       description: Update an existing to-do task
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            description: Bearer token
       responses:
         "200":
           description: Successful Operation
@@ -207,6 +259,12 @@ paths:
       summary: Delete a task
       description: Delete a to-do task by its ID
       parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            description: Bearer token
         - name: taskId
           in: path
           schema:
@@ -281,7 +339,7 @@ components:
       type: object
       required:
         - id
-        - name
+        - taskName
         - description
         - dueDate
         - completed
@@ -290,7 +348,7 @@ components:
           type: string
           format: uuid
           example: d290f1ee-6c54-4b01-90e6-d701748f0851
-        name:
+        taskName:
           type: string
           format: string18
           example: Finish project
@@ -301,33 +359,98 @@ components:
         dueDate:
           type: string
           format: date-time
-          example: '2023-12-31T23:59:59.999Z'
+          example: '2023-12-03T10:45:58.253+00:00'
         completed:
           type: boolean
           example: false
 
-    GetAllTasksResponse:
+    TaskWithUser:
       type: object
       properties:
-        tasks:
-          type: array
-          items:
-            $ref: '#/components/schemas/Task'
+        id:
+          type: integer
+          example: 4
+        taskName:
+          type: string
+          example: "Finish project"
+        description:
+          type: string
+          example: "Complete the API and front-end integration."
+        dueDate:
+          type: string
+          format: date-time
+          example: '2023-12-03T10:45:58.253+00:00'
+        completed:
+          type: boolean
+          example: false
+        ownerId:
+          type: integer
+          example: 2
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 2
+            username:
+              type: string
+              example: AdminUser
+            email:
+              type: string
+              format: email
+              example: AdminUser@email.com
+            password:
+              type: string
+              example: "*****"
+            listOfTasks:
+              type: array
+              example: [ ]
+            role:
+              type: string
+              example: ADMIN
+            enabled:
+              type: boolean
+              example: true
+            authorities:
+              type: array
+              items:
+                type: object
+                properties:
+                  authority:
+                    type: string
+                    example: ADMIN
+            accountNonExpired:
+              type: boolean
+              example: true
+            accountNonLocked:
+              type: boolean
+              example: true
+            credentialsNonExpired:
+              type: boolean
+              example: true
+      required:
+        - id
+        - taskName
+        - description
+        - dueDate
+        - completed
+        - ownerId
+        - user
+
+    GetAllTasksResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/TaskWithUser'
 
     PostTaskRequest:
       type: object
       required:
-        - id
-        - name
+        - taskName
         - description
         - dueDate
         - completed
       properties:
-        id:
-          type: string
-          format: uuid
-          example: d290f1ee-6c54-4b01-90e6-d701748f0851
-        name:
+        taskName:
           type: string
           format: string18
           example: Finish project

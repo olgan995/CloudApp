@@ -60,6 +60,23 @@ export const getTaskById = (taskId) => api.get(`/tasks/${taskId}`);
 export const updateTask = (taskId, taskData) => api.patch(`/tasks/${taskId}`, taskData);
 export const deleteTask = (taskId) => api.delete(`/tasks/${taskId}`);
 
+export const transcribeAudioFile = async (audioFile) => {
+    try {
+        console.log('Sending request with data:', audioFile);
+        const response = await api.post('/tasks/transcriptions', audioFile, {
+            headers: {
+                //"Content-Type" : 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW',
+                "Content-Type" : 'multipart/form-data'
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error transcribing audio:', error);
+        const errorMessage = error.response?.data?.message || 'An error occurred while transcribing audio.';
+        throw new Error(errorMessage);
+    }
+};
+
 const apis = {
     registerUser,
     loginUser,
@@ -69,6 +86,7 @@ const apis = {
     getTaskById,
     updateTask,
     deleteTask,
+    transcribeAudioFile,
 };
 
 export default apis;

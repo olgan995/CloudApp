@@ -72,6 +72,53 @@ body, html {
     font-size: 72px;
 }
 
-.task-details-card .card-text {
-    font-size: 24px;
+/* Upload File */
+.input-file {
+    display: none; /* Hide the default file input */
+}
+.custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-right: 5px;
+}
+.custom-file-upload:hover {
+    background-color: #e0e0e0;
+}
+.custom-file-upload {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+.ml-2 {
+    margin-left: 5px;
+}
+
+/* Additional styling for the textarea */
+.custom-textarea {
+    resize: vertical;
+    height: 100px;
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.task-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: 10px;
+}
+
+.task-item {
+    width: 100%;
 }
