@@ -77,53 +77,6 @@ export const transcribeAudioFile = async (audioFile) => {
     }
 };
 
-export const transcribeAudioFile2 = async (audioFile) => {
-    try {
-        const token = localStorage.getItem('token');
-        setAuthToken(token);
-
-        console.log('Sending request with data:', audioFile);
-
-        const formData = new FormData();
-        console.log('FormData:', formData);
-
-        formData.append('audioFile', audioFile, 'audioFile.wav');
-        console.log('FormData after appending audioFile:', formData);
-
-        const response = await api.post('/tasks/transcriptions', formData, {
-            headers: {
-                "Content-Type" : 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
-            },
-        });
-
-        return response.data;
-    } catch (error) {
-        console.error('Error transcribing audio:', error);
-        throw error;
-    }
-};
-
-
-export const transcribeAudioFile3 = (audioFile) => {
-    return api.post('/tasks/transcriptions', audioFile, {
-        headers: {
-            "Content-Type" : 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW',
-        },
-    })
-        .then(response => {
-            if (response.status === 200) {
-                return response.data;
-            } else {
-                throw new Error('Transcription failed');
-            }
-        })
-        .catch(error => {
-            console.error('Error transcribing audio:', error);
-            throw error;
-        });
-};
-
-
 const apis = {
     registerUser,
     loginUser,
