@@ -41,7 +41,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
     const [audioChunks, setAudioChunks] = useState([]);
     const mediaRecorderRef = useRef(null);
     const streamRef = useRef(null);
-    const [audioUrl, setAudioUrl] = useState('');
+    const [ setAudioUrl] = useState('');
     const MAX_RECORDING_TIME = 60 * 1000;
 
     // Function to handle available data during recording
@@ -262,6 +262,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                             name="description"
                             placeholder="Enter task description"
                             className="custom-textarea"
+                            maxLength={200}
                             value={formData.description}
                             onChange={handleChange}
                         />
