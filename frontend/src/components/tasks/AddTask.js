@@ -6,6 +6,7 @@ import '../styles/global.css';
 
 const AddTask = ({ showModal, handleClose, handleAddTask }) => {
 
+    // State for form data
     const [formData, setFormData] = useState({
         taskName: '',
         description: '',
@@ -42,22 +43,25 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
     const streamRef = useRef(null);
     const [audioUrl, setAudioUrl] = useState('');
 
+    // Function to handle available data during recording
     const handleDataAvailable = (event) => {
         if (event.data.size > 0) {
             setAudioChunks((prevChunks) => [...prevChunks, event.data]);
-            console.log('Received audio chunk:', event.data);
 
             const audioBlob = new Blob([...audioChunks, event.data], { type: 'audio/wav' });
             const audioUrl = URL.createObjectURL(audioBlob);
+            console.log('Received audio chunk:', audioBlob);
             setAudioUrl(audioUrl);
+            handleSendAudio(audioBlob);
         }
     };
 
+    // Function to start recording audio
     const startRecording = async () => {
         try {
+            // Access user's microphone and start recording
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             streamRef.current = stream;
-
             const mediaRecorder = new MediaRecorder(stream);
             mediaRecorder.ondataavailable = handleDataAvailable;
             mediaRecorderRef.current = mediaRecorder;
@@ -68,48 +72,48 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         }
     };
 
+    // Function to stop recording audio
     const stopRecording = () => {
         try {
             if (mediaRecorderRef.current) {
                 mediaRecorderRef.current.stop();
                 streamRef.current.getTracks().forEach((track) => track.stop());
                 setIsRecording(false);
-                handleSendAudio();
-                setAudioChunks([]);
+
+                setTimeout(() => {
+                    setAudioChunks([]);
+                }, 500);
             }
         } catch (error) {
             console.error('Error stopping recording:', error.message);
         }
     };
 
-    const handleSendAudio = async () => {
+    // Function to handle sending recorded audio
+    const handleSendAudio = async (audioBlob) => {
         try {
-            console.log("Starting handleSendAudio()");
-            console.log("Audio chunks length:", audioChunks.length);
-
-            if (audioChunks.length === 0) {
-                console.warn('No audio recorded.');
-                return;
-            }
-
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            console.log("Audio Blob:", audioBlob);
+            // Prepare audio data and send it to the backend for transcription
             const formData = new FormData();
             formData.append('audioFile', audioBlob, 'recording.wav');
 
             // Log the FormData object before making the API call
-            console.log('FormData:', formData);
+            console.log('FormData (Audio to be sent):', formData);
+
+            // Log each key-value pair in the FormData object
             formData.forEach((value, key) => {
-                console.log(key, value);
+                console.log(`${key}:`, value);
             });
 
             // Send the recorded audio to the backend for transcription
             try {
                 const transcription = await transcribeAudioFile(formData);
+                // Update form data with transcription result
                 setFormData((prevData) => ({
                     ...prevData,
                     description: transcription,
                 }));
-                console.log("transcription", transcription);
+                console.log("Transcription Result:", transcription);
             } catch (error) {
                 console.error('Error sending audio for transcription:', error);
             }
@@ -125,24 +129,25 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
 
     // Function to handle file change
     const handleFileChange = (event) => {
+        // Update selected file and its name
         const fileInput = event.target;
         const selectedFile = fileInput.files[0];
-        setSelectedFile(selectedFile); // Update the state with the selected file
-
-        // Update the selected file name in the state
+        setSelectedFile(selectedFile);
         if (selectedFile) {
             setSelectedFileName(selectedFile.name);
         } else {
-            setSelectedFileName(''); // If no file selected, reset the selected file name
+            setSelectedFileName('');
         }
     };
 
+    // Function to handle uploading selected file
     const handleFileUpload = async () => {
         if (!selectedFile) {
             console.warn('No file selected.');
             return;
         }
 
+        // Prepare file data and send it to the backend for transcription
         const formData = new FormData();
         formData.append('audioFile', selectedFile);
 
@@ -156,7 +161,8 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                 ...prevData,
                 description: transcription,
             }));
-            console.log('File uploaded successfully!', transcription);
+            console.log('File uploaded successfully!');
+            console.log("Transcription Result:", transcription);
         } catch (error) {
             console.error('Error uploading file:', error);
         }
