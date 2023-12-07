@@ -42,6 +42,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
     const mediaRecorderRef = useRef(null);
     const streamRef = useRef(null);
     const [audioUrl, setAudioUrl] = useState('');
+    const MAX_RECORDING_TIME = 60 * 1000;
 
     // Function to handle available data during recording
     const handleDataAvailable = (event) => {
@@ -52,6 +53,8 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
             const audioUrl = URL.createObjectURL(audioBlob);
             console.log('Received audio chunk:', audioBlob);
             setAudioUrl(audioUrl);
+
+            // Send the original audio blob to the handleSendAudio function
             handleSendAudio(audioBlob);
         }
     };
@@ -66,6 +69,12 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
             mediaRecorder.ondataavailable = handleDataAvailable;
             mediaRecorderRef.current = mediaRecorder;
             mediaRecorder.start();
+
+            // Set timeout to stop recording after 1 Minute
+            setTimeout(() => {
+                stopRecording();
+            }, MAX_RECORDING_TIME);
+
             setIsRecording(true);
         } catch (err) {
             console.error('Error accessing microphone:', err);
@@ -82,7 +91,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
 
                 setTimeout(() => {
                     setAudioChunks([]);
-                }, 500);
+                }, 5000);
             }
         } catch (error) {
             console.error('Error stopping recording:', error.message);
@@ -92,32 +101,29 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
     // Function to handle sending recorded audio
     const handleSendAudio = async (audioBlob) => {
         try {
-            console.log("Audio Blob:", audioBlob);
-            // Prepare audio data and send it to the backend for transcription
+            console.log("Original Audio Blob:", audioBlob);
+
+            const convertedAudio = await convertAudio(audioBlob);
+            console.log("Converted Audio Blob:", convertedAudio);
+
+            // Prepare the converted audio data and send it to the backend for transcription
             const formData = new FormData();
-            formData.append('audioFile', audioBlob, 'recording.wav');
+            formData.append('audioFile', convertedAudio, 'converted.wav');
 
             // Log the FormData object before making the API call
             console.log('FormData (Audio to be sent):', formData);
 
-            // Log each key-value pair in the FormData object
-            formData.forEach((value, key) => {
-                console.log(`${key}:`, value);
-            });
+            // Send the converted audio to the backend for transcription
+            const response = await transcribeAudioFile(formData);
+            const { transcription } = response;
 
-            // Send the recorded audio to the backend for transcription
-            try {
-                const transcription = await transcribeAudioFile(formData);
-                // Update form data with transcription result
-                setFormData((prevData) => ({
-                    ...prevData,
-                    description: transcription,
-                }));
-                console.log("Transcription Result:", transcription);
-            } catch (error) {
-                console.error('Error sending audio for transcription:', error);
-            }
-
+            // Update form data with transcription result
+            setFormData((prevData) => ({
+                ...prevData,
+                description: transcription,
+            }));
+            console.log('Transcription successfully!');
+            console.log("Transcription Result:", transcription);
         }   catch (error) {
             console.error('Error handling audio recording:', error);
         }
@@ -166,6 +172,63 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         } catch (error) {
             console.error('Error uploading file:', error);
         }
+    };
+
+    /// Function for converting audio/webm to audio/wav with LINEAR16 encoding
+    const convertAudio = async (audioBlob) => {
+        return new Promise((resolve, reject) => {
+            const audioContext = new AudioContext();
+            const reader = new FileReader();
+
+            reader.onload = async () => {
+                try {
+                    const arrayBuffer = reader.result;
+                    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                    const pcmBuffer = audioBuffer.getChannelData(0);
+
+                    const wavBuffer = new ArrayBuffer(44 + pcmBuffer.length * 2);
+                    const view = new DataView(wavBuffer);
+
+                    const writeString = (offset, string) => {
+                        for (let i = 0; i < string.length; i++) {
+                            view.setUint8(offset + i, string.charCodeAt(i));
+                        }
+                    };
+
+                    const floatTo16BitPCM = (output, offset, input) => {
+                        for (let i = 0; i < input.length; i++, offset += 2) {
+                            const s = Math.max(-1, Math.min(1, input[i]));
+                            output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+                        }
+                    };
+
+                    writeString(0, 'RIFF'); // RIFF header
+                    view.setUint32(4, 32 + pcmBuffer.length * 2, true); // file length minus RIFF header
+                    writeString(8, 'WAVE'); // RIFF type
+                    writeString(12, 'fmt '); // format chunk identifier
+                    view.setUint32(16, 16, true); // format chunk length
+                    view.setUint16(20, 1, true); // sample format (1 for PCM)
+                    view.setUint16(22, 1, true); // channel count
+                    view.setUint32(24, audioBuffer.sampleRate, true); // sample rate
+                    view.setUint32(28, audioBuffer.sampleRate * 2, true); // byte rate (sample rate * block align)
+                    view.setUint16(32, 2, true); // block align (channel count * bytes per sample)
+                    view.setUint16(34, 16, true); // bits per sample
+                    writeString(36, 'data'); // data chunk identifier
+                    view.setUint32(40, pcmBuffer.length * 2, true); // data chunk length
+
+                    floatTo16BitPCM(view, 44, pcmBuffer);
+
+                    const blob = new Blob([view], { type: 'audio/wav' });
+                    resolve(blob);
+                } catch (error) {
+                    reject(error);
+                }
+            };
+            reader.onerror = (error) => {
+                reject(error);
+            };
+            reader.readAsArrayBuffer(audioBlob);
+        });
     };
 
     return (
@@ -235,7 +298,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                                 accept="audio/*"
                             />
                             <label htmlFor="fileInput" className="custom-file-upload">
-                                <span>Choose File</span>
+                                <span>Choose Audio</span>
                             </label>
 
                             <span id="fileNameDisplay">{selectedFileName}</span>
@@ -247,17 +310,6 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                             </Button>
                         </Form.Group>
                     </div>
-                    <div className="d-flex center m-3">
-                        <audio controls src={audioUrl} />
-                        <Button
-                            href={audioUrl}
-                            variant="secondary"
-                            className="rounded-pill"
-                            download="recording.wav">
-                            Download
-                        </Button>
-                    </div>
-
 
                     <Form.Group controlId="taskDueDate" className="mt-3">
                         <Form.Label>Due Date:</Form.Label>
