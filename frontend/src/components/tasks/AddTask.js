@@ -243,7 +243,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
                             <Button className="rounded-pill ml-2"
                                     onClick={handleFileUpload}
                                     disabled={!selectedFile}>
-                                Upload File
+                                Transcribe
                             </Button>
                         </Form.Group>
                     </div>
