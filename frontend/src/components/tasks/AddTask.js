@@ -146,21 +146,19 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
         }
     };
 
-    // Function to handle uploading selected file
+    // Function to handle uploading selected Audio
     const handleFileUpload = async () => {
-        if (!selectedFile) {
-            console.warn('No file selected.');
-            return;
-        }
-
-        // Prepare file data and send it to the backend for transcription
-        const formData = new FormData();
-        formData.append('audioFile', selectedFile);
-
-        // Send the recorded audio to the backend for transcription
         try {
+            if (!selectedFile) {
+                console.warn('No file selected.');
+                return;
+            }
+            // Prepare file data and send it to the backend for transcription
+            const formData = new FormData();
+            formData.append('audioFile', selectedFile);
+
+            // Send the recorded audio to the backend for transcription
             const response = await transcribeAudioFile(formData);
-            // Destructure 'transcription' from the response
             const { transcription } = response;
 
             setFormData((prevData) => ({
@@ -170,7 +168,7 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
             console.log('File uploaded successfully!');
             console.log("Transcription Result:", transcription);
         } catch (error) {
-            console.error('Error uploading file:', error);
+            console.error('Error uploading Audio:', error);
         }
     };
 
