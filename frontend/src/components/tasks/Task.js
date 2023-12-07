@@ -17,7 +17,7 @@ const Task = (props) => {
     return (
         <Link to={`/tasks/${task.id}`}  style={{ textDecoration: 'none' }}>
             <Card className="m-2" style={{ width: '18rem', height: '100%' }}>
-                <Card.Body
+            <Card.Body
                     style={{
                         display: 'flex',
                         flexDirection: 'column',

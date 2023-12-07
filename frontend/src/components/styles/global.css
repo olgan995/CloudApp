@@ -112,3 +112,13 @@ body, html {
     border: 1px solid #ccc;
     margin-bottom: 10px;
 }
+
+.task-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: 10px;
+}
+
+.task-item {
+    width: 100%;
+}

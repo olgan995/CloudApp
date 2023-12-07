@@ -111,11 +111,14 @@ const AllTasks = () => {
                 handleDeleteTask={handleDeleteConfirm}
             />
 
-            <div className="d-flex m-3">
-                {tasks.map((task) => (
-                    <Task key={task.id} task={task} handleDelete={handleDelete} />
+            <div className="m-3 task-grid">
+                {tasks.map((task, index) => (
+                    <div key={task.id} className="task-item">
+                        <Task task={task} handleDelete={handleDelete} />
+                    </div>
                 ))}
             </div>
+
 
         </Container>
     );
