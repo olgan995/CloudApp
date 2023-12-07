@@ -2,7 +2,7 @@ import axios from 'axios';
 
 //const API_BASE_URL = 'http://localhost:8080';   // Local testing
 //constPI_BASE_URL = 'https://test-backend-server-lkqwezxwua-od.a.run.app';   // H2 Database
-const API_BASE_URL = 'https://backend-cloud-with-db-lkqwezxwua-ey.a.run.ap Ap';   // Real Database
+const API_BASE_URL = 'https://backend-cloud-with-db-lkqwezxwua-ey.a.run.app';   // Real Database
 
 const api = axios.create({
     baseURL: API_BASE_URL,
