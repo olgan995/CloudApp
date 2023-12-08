@@ -41,18 +41,14 @@ const AddTask = ({ showModal, handleClose, handleAddTask }) => {
     const [audioChunks, setAudioChunks] = useState([]);
     const mediaRecorderRef = useRef(null);
     const streamRef = useRef(null);
-    const [ setAudioUrl] = useState('');
     const MAX_RECORDING_TIME = 60 * 1000;
 
     // Function to handle available data during recording
     const handleDataAvailable = (event) => {
         if (event.data.size > 0) {
             setAudioChunks((prevChunks) => [...prevChunks, event.data]);
-
             const audioBlob = new Blob([...audioChunks, event.data], { type: 'audio/wav' });
-            const audioUrl = URL.createObjectURL(audioBlob);
             console.log('Received audio chunk:', audioBlob);
-            setAudioUrl(audioUrl);
 
             // Send the original audio blob to the handleSendAudio function
             handleSendAudio(audioBlob);
